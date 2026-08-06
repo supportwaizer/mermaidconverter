@@ -1,0 +1,96 @@
+# Proposal: AI-Augmented Architecture Review
+ 
+**For:** *[Architecture Review Board / CTO / Head of Engineering]*
+**From:** *[Name, Enterprise Architecture]*
+**Date:** 2026-08-05
+**Decision requested:** Approval of the process, and of a time-boxed pilot
+**Supporting detail:** *AI-Augmented Architecture Review — Process Design*
+ 
+---
+ 
+## The problem
+ 
+Our federated review process depends on human reviewers reading every proposal against a growing body of published architecture decisions. That does not scale, and it is failing in predictable ways:
+ 
+- Reviewers cannot reliably recall which of *[N]* published decisions apply to a given proposal, so conformance checking is inconsistent between reviewers and between domains.
+- Review has become a queue. Cycle time is *[X days]*, and teams increasingly proceed before advice arrives.
+- Institutional memory is lost. The same questions are re-litigated because nobody can find what was decided last time.
+- Non-conformance is discovered late — in production, or not at all.
+## The proposal
+ 
+Add an **AI advisory step to the existing review process**. Proposals are automatically assessed against our published architecture decisions, producing an evidence-backed findings report for the human reviewer.
+ 
+The advisory step identifies which decisions actually apply, and reports where the proposal conforms, deviates, or needs a waiver — citing the specific decision clause and the specific evidence in the proposal for every finding.
+ 
+**The advisory step advises. Humans decide.** It produces no approvals and blocks no work. It is one more voice owing advice under our existing process, so the governance model does not change — only the speed and consistency with which advice is available.
+ 
+## The process
+ 
+```mermaid
+flowchart TD
+    A["Published architecture decisions"] -. applicable decisions .-> C
+    B["Solution proposal submitted"] --> C["Automated triage and<br/>conformance advice"]
+    C --> D["Human review at the appropriate tier<br/><b>decision authority sits here</b>"]
+    D --> E["Decision recorded:<br/>approval, waiver, or amended standard"]
+    E --> F["Continuous assurance:<br/>drift and waiver expiry"]
+    F -. findings .-> A
+```
+ 
+Only the shaded step is new. Intake, review tiers, decision rights, and recording are unchanged.
+ 
+## What it delivers
+ 
+| Capability | Benefit |
+|---|---|
+| Automated conformance findings against published decisions | Consistent review regardless of which reviewer is assigned |
+| Automated triage — recommends the review tier and identifies affected parties | Removes the routing bottleneck; stops proposals reaching the wrong forum |
+| Precedent retrieval across past decisions | Ends re-litigation of settled questions |
+| Pre-read generation for review sessions | Meetings start at the disagreements, not the recap |
+| Deviation clustering across the portfolio | Reveals when a repeatedly-waived standard is simply wrong |
+ 
+## What it deliberately does not do
+ 
+- It does not approve, reject, or block anything.
+- It does not judge trade-offs where legitimate values conflict — that is the reviewers' job.
+- It does not replace the advice conversation between teams and architects.
+- It does not weaken accountability: a named human reviewer owns every published finding set.
+## Phased adoption
+ 
+| Phase | Scope | Duration |
+|---|---|---|
+| **1 — Foundation** | Decision authors confirm the constraints their decisions impose; establish an accuracy baseline from past reviews | *[6 weeks]* |
+| **2 — Pilot** | Advisory findings for *[one domain]*; measure against how our own reviewers assess the same proposals | *[8 weeks]* |
+| **3 — Rollout** | Extend to all domains and to the standard intake path | *[Q_]* |
+| **4 — Continuous assurance** | Detect drift between what was approved and what was built | *[Q_]* |
+ 
+We propose committing to **Phases 1 and 2 only**, with continuation contingent on measured accuracy.
+ 
+## What we need
+ 
+- *[N]* people for *[N]* weeks *[plus architect time for constraint confirmation]*
+- Access to the decision corpus, design repository, and system definitions
+- Agreement on the accuracy threshold that permits continuation
+- *[Budget estimate]*
+## Principal risks
+ 
+| Risk | Mitigation |
+|---|---|
+| Findings are noisy, so reviewers stop reading them | An agreed accuracy threshold, measured in the pilot, gates continuation |
+| Reviewers over-trust a clean report and stop reading proposals | Reports always show what was checked, abstained on, and out of scope — never a bare pass |
+| The process entrenches existing standards against better ideas | Any deviation may be escalated as a proposal to amend the standard |
+| Accountability becomes ambiguous | A named human reviewer owns every published finding set |
+| Confidential material handled inappropriately | Confidentiality and retention arrangements agreed before the pilot handles real proposals |
+ 
+## How we will judge it
+ 
+The pilot succeeds only if, measured against past human reviews:
+ 
+- Deviation detection is accurate enough to act on, against a threshold agreed in advance.
+- Review cycle time falls by *[target]*.
+- Reviewers use it when they are not required to.
+Accuracy will be assessed against the rate at which *our own reviewers agree with each other*, which is the realistic ceiling for any reviewer, human or otherwise.
+ 
+## Decision requested
+ 
+Approval of the process as described, and authorisation to proceed with Phases 1 and 2, returning to this board with pilot results before any wider rollout.
+ 
