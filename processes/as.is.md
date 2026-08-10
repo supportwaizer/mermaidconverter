@@ -4,302 +4,174 @@
 
 The Federated Architecture Review Process defines the current process for reviewing proposed solutions and architecture changes.
 
-The process distributes architecture review responsibilities across the **APT**, **Solution Architecture (SA)**, **ODT**, and **ITG** teams.
+The process distributes architecture review responsibilities across the following teams:
 
-The process consists of two related review workflows:
+- **APT**
+- **Solution Architecture (SA)**
+- **ODT**
+- **ITG**
 
-1. **Portfolio Review Process**
-2. **Solution Architecture Review Process**
+The process uses a federated review model in which APT performs the initial review. Requests requiring additional architecture oversight are escalated to the Solution Architecture team.
 
-The Portfolio Review Process serves as the initial review path. Requests requiring additional architectural review are escalated to the Solution Architecture Review Process.
+Solution Architecture may engage ODT for additional advice during an escalated review.
 
-Both review paths ultimately proceed through the ITG tollgate approval process.
+Both the APT approval path and the Solution Architecture approval path ultimately converge on the ITG tollgate approval process.
 
 ---
 
-## 2. Process Participants
+# 2. Process Participants
 
-| Participant | Role in the Review Process |
+| Participant | Responsibility |
 |---|---|
-| **APT** | Receives and performs Portfolio Reviews, validates submitted documentation, determines review readiness, conducts the initial review, determines whether escalation is required, and coordinates completion of non-escalated reviews. |
-| **SA – Solution Architecture** | Performs Solution Architecture Reviews for requests that are submitted or escalated to Solution Architecture. SA validates documentation, conducts the architecture review, determines whether ODT advice is required, and determines whether the review can be approved. |
-| **ODT** | Provides advice to SA and APT when requested as part of a Solution Architecture Review. |
-| **ITG** | Performs the final audit and approves the applicable tollgate after completion of the architecture review. |
+| **APT** | Receives review requests, validates request documentation, conducts the initial review, determines whether Solution Architecture escalation is required, approves reviews that do not require escalation, and coordinates resubmission when Solution Architecture requests changes. |
+| **Solution Architecture (SA)** | Reviews escalated requests, validates escalated-request documentation, conducts Solution Architecture review, determines whether ODT advice is required, and determines whether the architecture review can be approved. |
+| **ODT** | Provides advice to Solution Architecture and APT when requested during an escalated architecture review. |
+| **ITG** | Audits the completed architecture review and approves the applicable tollgate. |
 
 ---
 
-# 3. Portfolio Review Process
+# 3. Process Overview
 
-## 3.1 Overview
-
-The Portfolio Review Process is the initial architecture review path.
-
-APT evaluates the submitted request and determines whether the review can be completed within the Portfolio Review Process or requires escalation to the Solution Architecture team.
-
-The high-level process is:
+The Federated Architecture Review Process follows the general flow below:
 
 ```text
-Submit Review Request
+Review Request Initiated
         |
         v
-Validate Request Documentation
+[APT] Submit Review Request
         |
         v
-  Ready for Review?
-     /        \
-   No          Yes
-   |            |
-   |            v
-   |      Conduct Review
-   |            |
-   |            v
-   |    Require Escalation?
-   |        /        \
-   |      No          Yes
-   |      |            |
-   |      v            v
-   |  Approve      Escalate Review
-   |  Review          to SA
-   |      |
-   |      v
-   |  Notify SA
-   |  and ODT(s)
-   |      |
-   +------+
-          |
-          v
-   Audit and Approve
-        Tollgate
-          |
-          v
-    Review Completed
+[APT] Validate Request Documentation
+        |
+        v
+Ready for Review?
+   |        |
+  No       Yes
+   |        |
+   |        v
+   |   Conduct Review
+   |        |
+   |        v
+   |   Require Escalation?
+   |       |       |
+   |      No      Yes
+   |       |       |
+   |       v       v
+   |    Approve   Escalate Review
+   |    Review       to SA
+   |       |           |
+   |       |           v
+   |       |    Validate Escalated
+   |       |    Request Documentation
+   |       |           |
+   |       |           v
+   |       |     Ready for Review?
+   |       |        |       |
+   |       |       No      Yes
+   |       |        |       |
+   |       |        |       v
+   |       |        |   Conduct Escalated
+   |       |        |   Request SA Review
+   |       |        |       |
+   |       |        |       v
+   |       |        |   Require ODT Advice?
+   |       |        |      |         |
+   |       |        |     Yes       No
+   |       |        |      |         |
+   |       |        |      v         |
+   |       |        |   ODT Advises  |
+   |       |        |   SA and APT   |
+   |       |        |      |         |
+   |       |        |      +-----> Conduct
+   |       |        |               SA Review
+   |       |        |                  |
+   |       |        |                  v
+   |       |        |          Review Approved?
+   |       |        |             |        |
+   |       |        |            No       Yes
+   |       |        |             |        |
+   |       |        |             |        v
+   |       |        |             |    Notify APT
+   |       |        |             |    and ODT(s)
+   |       |        |             |
+   |       |        +-------------+
+   |       |              Revise
+   |       |          Documentation
+   |       |
+   |       v
+   |   Notify SA
+   |   and ODT(s)
+   |
+   +<------ SA Review Not Approved
+            with Suggested Changes
+            |
+            v
+      Resubmit Review Request
+            |
+            v
+      Portfolio Review Repeats
+
+Approved paths
+        |
+        v
+[ITG] Audit and Approve Tollgate
+        |
+        v
+Review Completed
 ```
 
 ---
 
-## 3.2 Step 1 — Submit Review Request
+# 4. APT Portfolio Review Process
+
+## 4.1 Review Request Initiated
+
+The process begins when a review request is initiated.
+
+The request enters the APT review process.
+
+---
+
+## 4.2 Step 1 — Submit Review Request
 
 **Owner:** APT
 
-A review request is submitted to initiate the Portfolio Review Process.
+APT submits or receives the review request for processing.
 
-The submitted request provides the information and supporting documentation necessary for the architecture review.
+The request contains the information and supporting documentation required to begin the architecture review process.
 
 **Output:** Review request submitted.
 
 ---
 
-## 3.3 Step 2 — Validate Request Documentation
-
-**Owner:** APT
-
-APT validates the documentation included with the review request.
-
-The purpose of this step is to determine whether sufficient information has been provided to allow the architecture review to proceed.
-
-**Output:** Documentation validated for review readiness.
-
----
-
-## 3.4 Step 3 — Ready for Review?
-
-**Owner:** APT  
-**Type:** Decision
-
-APT determines whether the submitted request contains sufficient information to begin the review.
-
-### No
-
-If the request is not ready for review, the documentation must be revised.
-
-The request is returned for documentation updates and subsequently re-enters the validation process.
-
-### Yes
-
-If the request is ready for review, the process proceeds to:
-
-**Step 4 — Conduct Review**
-
----
-
-## 3.5 Step 4 — Conduct Review
-
-**Owner:** APT
-
-APT conducts the Portfolio Review using the submitted request and supporting documentation.
-
-Following completion of the review, APT determines whether the request can continue through the Portfolio Review approval path or whether Solution Architecture involvement is required.
-
-**Output:** Portfolio Review performed.
-
----
-
-## 3.6 Step 5 — Require Escalation?
-
-**Owner:** APT  
-**Type:** Decision
-
-APT determines whether the review requires escalation to the Solution Architecture team.
-
-### No
-
-If escalation is not required, the request proceeds to:
-
-**Step 7 — Approve Review**
-
-### Yes
-
-If escalation is required, the request proceeds to:
-
-**Step 6 — Escalate Review to SA**
-
-The request then enters the **Solution Architecture Review Process**.
-
----
-
-## 3.7 Step 6 — Escalate Review to SA
-
-**Owner:** SA
-
-The review request is escalated from the Portfolio Review Process to the Solution Architecture team.
-
-The request becomes an input to the Solution Architecture Review Process described in Section 4.
-
-**Output:** Request transferred to Solution Architecture Review.
-
----
-
-## 3.8 Step 7 — Approve Review
-
-**Owner:** APT
-
-If Solution Architecture escalation is not required, APT approves the Portfolio Review.
-
-**Output:** Portfolio Review approved.
-
----
-
-## 3.9 Step 8 — Notify SA and ODT(s)
-
-**Owner:** APT
-
-Following approval of the Portfolio Review, APT notifies the appropriate Solution Architecture and ODT stakeholders.
-
-**Output:** Relevant stakeholders notified of the review disposition.
-
----
-
-## 3.10 Step 9 — Audit and Approve Tollgate
-
-**Owner:** ITG
-
-ITG audits the completed review and approves the applicable tollgate.
-
-Following tollgate approval, the review is considered complete.
-
-**Output:** Tollgate approved and review completed.
-
----
-
-# 4. Solution Architecture Review Process
-
-## 4.1 Overview
-
-The Solution Architecture Review Process is used when a review request is submitted or escalated to the Solution Architecture team.
-
-This process provides an additional level of architectural review and allows the Solution Architect to obtain ODT advice when necessary.
-
-The high-level process is:
-
-```text
-Submitted or Escalated
-    Review Request
-          |
-          v
-Validate Request Documentation
-          |
-          v
-    Ready for Review?
-       /        \
-     No          Yes
-     |            |
-     |            v
-     |      Conduct Review
-     |            |
-     |            v
-     |    Require ODT Advice?
-     |        /        \
-     |      Yes         No
-     |       |           |
-     |       v           |
-     |   ODT Advises     |
-     |   SA and APT      |
-     |       |           |
-     |       +-----------+
-     |            |
-     |            v
-     |      Conduct Review
-     |            |
-     |            v
-     |     Review Approved?
-     |        /        \
-     |      No          Yes
-     |       |           |
-     |       |           v
-     |       |      Notify APT
-     |       |      and ODT(s)
-     |       |           |
-     |       +--> Conduct|
-     |            Review |
-     |                  |
-     +------------------+
-                        |
-                        v
-                Audit and Approve
-                     Tollgate
-                        |
-                        v
-                 Review Completed
-```
-
----
-
-## 4.2 Step 1 — Submitted or Escalated Review Request
-
-**Owner:** APT
-
-The Solution Architecture Review Process begins when a review request is submitted or escalated for Solution Architecture review.
-
-An escalated request may originate from the Portfolio Review Process.
-
-**Output:** Review request received for Solution Architecture review.
-
----
-
 ## 4.3 Step 2 — Validate Request Documentation
 
-**Owner:** SA
+**Owner:** APT
 
-The Solution Architect validates the documentation associated with the request.
+APT validates the documentation associated with the review request.
 
-The objective is to determine whether sufficient documentation exists to conduct the Solution Architecture Review.
+The objective of this activity is to determine whether sufficient information has been provided to allow the review to proceed.
 
-**Output:** Documentation validated for Solution Architecture review.
+**Output:** Request documentation validated.
 
 ---
 
 ## 4.4 Step 3 — Ready for Review?
 
-**Owner:** SA  
-**Type:** Decision
+**Owner:** APT  
+**Type:** Decision Gateway
 
-The Solution Architect determines whether the request contains sufficient information to begin the architecture review.
+APT determines whether the request contains sufficient information to conduct the review.
 
-### No
+### No — Revise Documentation
 
-If the request is not ready for review, the documentation must be revised.
+If the request is not ready for review, the request is returned for documentation revisions.
 
-The request is returned for documentation updates and subsequently re-enters the validation process.
+Once the required documentation has been revised, the request is resubmitted through:
+
+**Step 1 — Submit Review Request**
+
+The documentation is then validated again.
 
 ### Yes
 
@@ -311,337 +183,513 @@ If the request is ready for review, the process proceeds to:
 
 ## 4.5 Step 4 — Conduct Review
 
-**Owner:** SA
+**Owner:** APT
 
-The Solution Architect conducts the architecture review using the submitted solution information and supporting documentation.
+APT conducts the initial architecture review using the submitted request and supporting documentation.
 
-During the review, the Solution Architect may determine that additional advice from the appropriate ODT is necessary.
+Following the review, APT determines whether the request can be approved through the federated APT review process or requires escalation to Solution Architecture.
 
-**Output:** Solution Architecture Review performed.
+**Output:** Initial architecture review completed.
 
 ---
 
-## 4.6 Step 5 — Require ODT Advice?
+## 4.6 Step 5 — Require Escalation?
 
-**Owner:** SA  
-**Type:** Decision
+**Owner:** APT  
+**Type:** Decision Gateway
 
-The Solution Architect determines whether ODT input or advice is required to continue or complete the review.
+APT determines whether the review requires escalation to the Solution Architecture team.
 
 ### No
 
-If ODT advice is not required, the process proceeds to:
+If Solution Architecture escalation is not required, the process proceeds to:
 
-**Step 7 — Review Approved?**
+**Step 7 — Approve Review**
 
 ### Yes
 
-If ODT advice is required, the process proceeds to:
+If Solution Architecture review is required, the process proceeds to:
 
-**Step 6 — Advise SA and APT on Review**
+**Step 6 — Escalate Review to SA**
 
 ---
 
-## 4.7 Step 6 — Advise SA and APT on Review
+## 4.7 Step 6 — Escalate Review to SA
+
+**Owner:** APT
+
+APT escalates the review request to the Solution Architecture team.
+
+The escalated request enters the Solution Architecture Review portion of the Federated Architecture Review Process.
+
+**Output:** Request escalated to Solution Architecture.
+
+---
+
+## 4.8 Step 7 — Approve Review
+
+**Owner:** APT
+
+When Solution Architecture escalation is not required, APT approves the architecture review.
+
+The approved review then proceeds to stakeholder notification.
+
+**Output:** APT review approved.
+
+---
+
+## 4.9 Step 8 — Notify SA and ODT(s)
+
+**Owner:** APT
+
+APT notifies the appropriate Solution Architecture and ODT stakeholders that the review has been approved.
+
+Following notification, the request proceeds to the ITG tollgate process.
+
+**Output:** SA and applicable ODT stakeholders notified.
+
+---
+
+# 5. Escalated Solution Architecture Review Process
+
+## 5.1 Entry into Solution Architecture Review
+
+The Solution Architecture Review Process begins when APT determines that a request requires escalation.
+
+The request enters this process through:
+
+**Step 6 — Escalate Review to SA**
+
+---
+
+## 5.2 Step 6a — Validate Escalated Request Documentation
+
+**Owner:** Solution Architecture
+
+Solution Architecture validates the documentation associated with the escalated request.
+
+The objective is to determine whether sufficient information exists to conduct the Solution Architecture review.
+
+**Output:** Escalated request documentation validated.
+
+---
+
+## 5.3 Step 6b — Ready for Review?
+
+**Owner:** Solution Architecture  
+**Type:** Decision Gateway
+
+Solution Architecture determines whether the escalated request contains sufficient information to proceed with the review.
+
+### No — Revise Documentation
+
+If the escalated request is not ready for review, documentation revisions are required.
+
+The request is returned through the escalation path so that the required documentation can be updated.
+
+Once the documentation has been revised, the request is again escalated to Solution Architecture and re-enters:
+
+**Step 6a — Validate Escalated Request Documentation**
+
+This cycle continues until the request is ready for Solution Architecture review.
+
+### Yes
+
+If the request is ready for review, the process proceeds to:
+
+**Step 6c — Conduct Escalated Request SA Review**
+
+---
+
+## 5.4 Step 6c — Conduct Escalated Request SA Review
+
+**Owner:** Solution Architecture
+
+Solution Architecture conducts the detailed architecture review of the escalated request.
+
+During the review, Solution Architecture determines whether input from the appropriate ODT is required.
+
+**Output:** Solution Architecture review performed.
+
+---
+
+## 5.5 Step 6d — Require ODT Advice?
+
+**Owner:** Solution Architecture  
+**Type:** Decision Gateway
+
+Solution Architecture determines whether additional advice from an ODT is required.
+
+### Yes
+
+If ODT advice is required, the review proceeds to:
+
+**ODT Advises SA and APT on Review**
+
+### No
+
+If ODT advice is not required, the review proceeds to:
+
+**Step 6e — Review Approved?**
+
+---
+
+# 6. ODT Review Participation
+
+## 6.1 ODT Advises SA and APT on Review
 
 **Owner:** ODT
 
-The appropriate ODT reviews the relevant aspects of the proposed solution and provides advice to SA and APT.
+When requested by Solution Architecture, the appropriate ODT reviews the relevant aspects of the request and provides advice to both:
 
-After ODT advice has been provided, the review returns to the Solution Architect for continued review.
+- Solution Architecture
+- APT
 
-The process returns to:
+Following receipt of ODT advice, the request returns to:
 
-**Step 4 — Conduct Review**
+**Step 6c — Conduct Escalated Request SA Review**
+
+Solution Architecture considers the ODT advice as part of the continuing architecture review.
 
 **Output:** ODT advice provided to SA and APT.
 
 ---
 
-## 4.8 Step 7 — Review Approved?
+# 7. Solution Architecture Approval
 
-**Owner:** SA  
-**Type:** Decision
+## 7.1 Step 6e — Review Approved?
 
-The Solution Architect determines whether the architecture review can be approved.
+**Owner:** Solution Architecture  
+**Type:** Decision Gateway
 
-### No
-
-If the review cannot be approved, the process returns to:
-
-**Step 4 — Conduct Review**
-
-The review continues until the outstanding issues are addressed and the request can again be evaluated for approval.
+Following the Solution Architecture review, SA determines whether the request can be approved.
 
 ### Yes
 
-If the review is approved, the process proceeds to:
+If the architecture review is approved, the process proceeds to:
 
-**Step 8 — Notify APT and ODT(s)**
+**Step 8a — Notify APT and ODT(s)**
+
+### No — With Suggested Changes
+
+If the architecture review is not approved, Solution Architecture returns the request with suggested changes.
+
+The request returns to the APT submission process.
+
+The process re-enters at:
+
+**Step 1 — Submit Review Request**
+
+The revised request then proceeds again through:
+
+```text
+Submit Review Request
+        |
+        v
+Validate Request Documentation
+        |
+        v
+Ready for Review?
+        |
+        v
+Conduct Review
+        |
+        v
+Require Escalation?
+```
+
+If escalation is again required, the revised request is resubmitted to Solution Architecture through the normal escalation path.
+
+This creates an iterative review cycle until the request is either approved through the APT process or approved through the Solution Architecture review process.
 
 ---
 
-## 4.9 Step 8 — Notify APT and ODT(s)
+## 7.2 Step 8a — Notify APT and ODT(s)
 
-**Owner:** SA
+**Owner:** Solution Architecture
 
-Following approval of the Solution Architecture Review, the Solution Architect notifies APT and the appropriate ODT stakeholders.
+After Solution Architecture approves the review, SA notifies:
 
-**Output:** Relevant stakeholders notified of the approved Solution Architecture Review.
+- APT
+- Applicable ODT stakeholder(s)
+
+The approved review then proceeds to ITG.
+
+**Output:** APT and ODT stakeholders notified of SA approval.
 
 ---
 
-## 4.10 Step 9 — Audit and Approve Tollgate
+# 8. ITG Tollgate Approval
+
+## 8.1 Step 9 — Audit and Approve Tollgate
 
 **Owner:** ITG
 
-ITG audits the completed Solution Architecture Review and approves the applicable tollgate.
+Both architecture approval paths converge at the ITG tollgate.
 
-Following tollgate approval, the review is considered complete.
+Requests may reach ITG through either of the following paths:
 
-**Output:** Tollgate approved and review completed.
+### APT Approval Path
+
+```text
+APT Conduct Review
+        |
+        v
+No Escalation Required
+        |
+        v
+APT Approve Review
+        |
+        v
+Notify SA and ODT(s)
+        |
+        v
+ITG Audit and Approve Tollgate
+```
+
+### Solution Architecture Approval Path
+
+```text
+APT Conduct Review
+        |
+        v
+Escalation Required
+        |
+        v
+Solution Architecture Review
+        |
+        v
+SA Review Approved
+        |
+        v
+Notify APT and ODT(s)
+        |
+        v
+ITG Audit and Approve Tollgate
+```
+
+ITG audits the completed review and approves the applicable tollgate.
+
+**Output:** Tollgate approved.
 
 ---
 
-# 5. Combined Federated Architecture Review Flow
+# 9. Review Completed
 
-The Portfolio Review Process and Solution Architecture Review Process together constitute the current Federated Architecture Review model.
+Following ITG approval of the tollgate, the Federated Architecture Review is considered complete.
 
 ```text
-                         FEDERATED ARCHITECTURE REVIEW
-                                      |
-                                      v
-                   +----------------------------------+
-                   |     PORTFOLIO REVIEW PROCESS     |
-                   +----------------------------------+
-                                      |
-                                      v
-                           Submit Review Request
-                                      |
-                                      v
-                       Validate Request Documentation
-                                      |
-                                      v
-                          +---------------------+
-                          |  Ready for Review?  |
-                          +---------------------+
-                              /             \
-                            No               Yes
-                            |                 |
-                            |                 v
-                            |          Conduct Review
-                            |                 |
-                            |                 v
-                            |      +---------------------+
-                            |      | Require Escalation? |
-                            |      +---------------------+
-                            |          /             \
-                            |        No               Yes
-                            |        |                 |
-                            |        v                 v
-                            |   Approve Review    Escalate to SA
-                            |        |                 |
-                            |        v                 |
-                            |  Notify SA and           |
-                            |     ODT(s)               |
-                            |        |                 |
-                            |        |                 v
-                            |        |   +----------------------------------+
-                            |        |   | SOLUTION ARCHITECTURE REVIEW     |
-                            |        |   |            PROCESS               |
-                            |        |   +----------------------------------+
-                            |        |                 |
-                            |        |                 v
-                            |        |       Validate Request Documentation
-                            |        |                 |
-                            |        |                 v
-                            |        |        +--------------------+
-                            |        |        | Ready for Review?  |
-                            |        |        +--------------------+
-                            |        |            /          \
-                            |        |          No            Yes
-                            |        |          |              |
-                            |        |          |              v
-                            |        |          |       Conduct Review
-                            |        |          |              |
-                            |        |          |              v
-                            |        |          |   +----------------------+
-                            |        |          |   | Require ODT Advice?  |
-                            |        |          |   +----------------------+
-                            |        |          |       /             \
-                            |        |          |     Yes              No
-                            |        |          |      |                |
-                            |        |          |      v                |
-                            |        |          | ODT Advises SA        |
-                            |        |          |    and APT            |
-                            |        |          |      |                |
-                            |        |          |      +-----> Conduct Review
-                            |        |          |                     |
-                            |        |          |                     v
-                            |        |          |           +------------------+
-                            |        |          |           | Review Approved? |
-                            |        |          |           +------------------+
-                            |        |          |              /          \
-                            |        |          |            No            Yes
-                            |        |          |            |              |
-                            |        |          |            +----->        v
-                            |        |          |              Conduct   Notify APT
-                            |        |          |               Review   and ODT(s)
-                            |        |          |                            |
-                            |        |          +----------------------------+
-                            |        |                                       |
-                            +--------+---------------------------------------+
-                                     |
-                                     v
-                           +-------------------------+
-                           |           ITG           |
-                           | Audit and Approve       |
-                           | Tollgate                |
-                           +-------------------------+
-                                     |
-                                     v
-                              REVIEW COMPLETED
+ITG Audit and Approve Tollgate
+              |
+              v
+       Review Completed
 ```
 
 ---
 
-# 6. Responsibility Matrix
+# 10. Decision Summary
+
+| Decision | Owner | Yes | No |
+|---|---|---|---|
+| **Ready for Review?** | APT | Conduct Review | Revise documentation and resubmit review request |
+| **Require Escalation?** | APT | Escalate Review to SA | Approve Review |
+| **Ready for Review? — Escalated Request** | SA | Conduct Escalated Request SA Review | Revise documentation and return through escalation path |
+| **Require ODT Advice?** | SA | Obtain ODT advice and continue SA review | Proceed to approval decision |
+| **Review Approved?** | SA | Notify APT and ODT(s) and proceed to ITG | Return to APT with suggested changes and restart review cycle |
+
+---
+
+# 11. Responsibility Matrix
 
 | Process Activity | APT | SA | ODT | ITG |
 |---|:---:|:---:|:---:|:---:|
-| Submit/receive Portfolio Review request | X | | | |
-| Validate Portfolio Review documentation | X | | | |
-| Determine Portfolio Review readiness | X | | | |
-| Conduct Portfolio Review | X | | | |
-| Determine need for SA escalation | X | | | |
-| Escalate review to Solution Architecture | X | X | | |
-| Receive submitted/escalated SA Review | X | X | | |
-| Validate Solution Architecture Review documentation | | X | | |
-| Determine SA Review readiness | | X | | |
-| Conduct Solution Architecture Review | | X | | |
+| Initiate/submit review request | X | | | |
+| Validate initial request documentation | X | | | |
+| Determine initial review readiness | X | | | |
+| Conduct initial review | X | | | |
+| Determine whether escalation is required | X | | | |
+| Approve non-escalated review | X | | | |
+| Escalate review to Solution Architecture | X | | | |
+| Validate escalated-request documentation | | X | | |
+| Determine escalated-request readiness | | X | | |
+| Conduct escalated Solution Architecture review | | X | | |
 | Determine whether ODT advice is required | | X | | |
 | Provide review advice | | | X | |
-| Determine whether SA Review is approved | | X | | |
-| Approve non-escalated Portfolio Review | X | | | |
-| Notify SA and ODT following Portfolio Review | X | | | |
-| Notify APT and ODT following SA Review | | X | | |
-| Audit completed review | | | | X |
+| Determine whether SA review is approved | | X | | |
+| Return suggested changes for an unapproved SA review | | X | | |
+| Revise/resubmit request following SA feedback | X | | | |
+| Notify SA and ODT after APT approval | X | | | |
+| Notify APT and ODT after SA approval | | X | | |
+| Audit completed architecture review | | | | X |
 | Approve tollgate | | | | X |
 
 ---
 
-# 7. Review Paths
+# 12. Primary Review Paths
 
-The Federated Architecture Review Process supports two primary paths.
+The process supports three significant execution paths.
 
-## 7.1 Portfolio Review Path
+## 12.1 Federated APT Approval Path
 
-A request that can be completed without Solution Architecture escalation follows this path:
+A request that does not require Solution Architecture escalation follows:
 
 ```text
-Submit Request
-    ->
-Validate Documentation
-    ->
+Review Request Initiated
+        ->
+Submit Review Request
+        ->
+Validate Request Documentation
+        ->
 Ready for Review
-    ->
+        ->
 Conduct Review
-    ->
+        ->
 No Escalation Required
-    ->
+        ->
 Approve Review
-    ->
+        ->
 Notify SA and ODT(s)
-    ->
-ITG Audit and Tollgate Approval
-    ->
+        ->
+ITG Audit and Approve Tollgate
+        ->
 Review Completed
 ```
 
-## 7.2 Escalated Solution Architecture Review Path
+---
 
-A request requiring Solution Architecture involvement follows this path:
+## 12.2 Escalated Solution Architecture Approval Path
+
+A request requiring Solution Architecture review follows:
 
 ```text
-Submit Request
-    ->
-Validate Documentation
-    ->
-Portfolio Review
-    ->
-Escalation Required
-    ->
-Solution Architecture Review
-    ->
-Validate Documentation
-    ->
+Review Request Initiated
+        ->
+Submit Review Request
+        ->
+Validate Request Documentation
+        ->
 Ready for Review
-    ->
+        ->
 Conduct Review
-    ->
-ODT Advice, if Required
-    ->
-Review Approval
-    ->
+        ->
+Escalation Required
+        ->
+Escalate Review to SA
+        ->
+Validate Escalated Request Documentation
+        ->
+Ready for Review
+        ->
+Conduct Escalated Request SA Review
+        ->
+Obtain ODT Advice if Required
+        ->
+Review Approved
+        ->
 Notify APT and ODT(s)
-    ->
-ITG Audit and Tollgate Approval
-    ->
+        ->
+ITG Audit and Approve Tollgate
+        ->
 Review Completed
 ```
 
 ---
 
-# 8. Review Outcomes
+## 12.3 Solution Architecture Rework Path
 
-A review concludes when the appropriate architecture review process has been completed and the applicable ITG tollgate has been audited and approved.
-
-A review may therefore reach completion through either of the following routes:
-
-**Portfolio Review Approval**
+When Solution Architecture does not approve a review, it returns the request with suggested changes.
 
 ```text
-APT Review
-    ->
-APT Approval
-    ->
-Stakeholder Notification
-    ->
-ITG Tollgate Approval
-    ->
-Review Completed
+Conduct Escalated Request SA Review
+        ->
+Review Approved?
+        ->
+No — Suggested Changes
+        ->
+Return to APT
+        ->
+Submit Revised Review Request
+        ->
+Validate Request Documentation
+        ->
+Conduct Review
+        ->
+Determine Escalation
+        ->
+Continue Appropriate Review Path
 ```
 
-**Solution Architecture Review Approval**
+The review therefore remains iterative until an approval path is successfully completed.
+
+---
+
+# 13. Documentation Revision Paths
+
+The process contains two separate documentation-revision loops.
+
+## 13.1 APT Documentation Revision
+
+When APT determines that the initial request is not ready for review:
 
 ```text
-APT Review
-    ->
-Escalation
-    ->
-SA Review
-    ->
-SA Approval
-    ->
-Stakeholder Notification
-    ->
-ITG Tollgate Approval
-    ->
-Review Completed
+Validate Request Documentation
+        ->
+Ready for Review? = No
+        ->
+Revise Documentation
+        ->
+Submit Review Request
+        ->
+Validate Request Documentation
 ```
 
 ---
 
-# 9. Process Summary
+## 13.2 Escalated Request Documentation Revision
 
-The current Federated Architecture Review Process establishes a tiered architecture review model.
+When Solution Architecture determines that an escalated request is not ready:
 
-APT provides the initial Portfolio Review and determines whether the request requires additional Solution Architecture involvement.
+```text
+Validate Escalated Request Documentation
+        ->
+Ready for Review? = No
+        ->
+Revise Documentation
+        ->
+Escalate Review to SA
+        ->
+Validate Escalated Request Documentation
+```
 
-Requests that do not require escalation can be approved through the Portfolio Review Process.
+---
 
-Requests requiring additional architecture review are escalated to the Solution Architecture team. The Solution Architect conducts the review and may seek advice from the appropriate ODT where necessary.
+# 14. Process Completion Criteria
 
-After the applicable architecture review is approved, relevant stakeholders are notified and ITG performs the final audit and tollgate approval.
+A Federated Architecture Review is complete when:
 
-Completion of the ITG tollgate approval marks completion of the architecture review process.
+1. The architecture review has been approved through either the APT or Solution Architecture review path.
+2. Required stakeholder notifications have been completed.
+3. ITG has audited the completed review.
+4. ITG has approved the applicable tollgate.
+
+The final state of the process is:
+
+**Review Completed**
+
+---
+
+# 15. Process Summary
+
+The Federated Architecture Review Process provides two levels of architecture review.
+
+APT owns the initial review and determines whether the request can be approved through the federated review process or requires escalation to Solution Architecture.
+
+If escalation is required, Solution Architecture validates the escalated request and conducts a detailed architecture review. Solution Architecture may obtain advice from the appropriate ODT and incorporate that advice into its review.
+
+If Solution Architecture does not approve the request, the request is returned to APT with suggested changes and re-enters the review process after revision.
+
+If either APT or Solution Architecture approves the review, the appropriate stakeholders are notified and the request proceeds to ITG.
+
+ITG performs the final audit and approves the applicable tollgate.
+
+ITG tollgate approval marks completion of the Federated Architecture Review Process.
