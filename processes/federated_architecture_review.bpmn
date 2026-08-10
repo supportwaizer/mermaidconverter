@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_FederatedArchitectureReview"
+                  targetNamespace="http://example.com/federated-architecture-review">
+
+  <bpmn:collaboration id="Collaboration_FederatedArchitectureReview">
+    <bpmn:participant id="Participant_FederatedArchitectureReview"
+                      name="Federated Architecture Review"
+                      processRef="Process_FederatedArchitectureReview"/>
+  </bpmn:collaboration>
+
+  <bpmn:process id="Process_FederatedArchitectureReview" name="Federated Architecture Review" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Main">
+      <bpmn:lane id="Lane_APT" name="APT">
+        <bpmn:flowNodeRef>StartEvent_ReviewSubmitted</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SubmitReviewRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ValidatePortfolioDocs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PortfolioReady</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ConductPortfolioReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_RequireEscalation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ApprovePortfolioReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_NotifySAODT</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_SA" name="Solution Architecture (SA)">
+        <bpmn:flowNodeRef>Task_EscalateToSA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ValidateSADocs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_SAReady</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ConductSAReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_RequireODTAdvice</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_SAApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_NotifyAPTODT</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_ODT" name="ODT">
+        <bpmn:flowNodeRef>Task_ODTAdvises</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_ITG" name="ITG">
+        <bpmn:flowNodeRef>Task_ITGAuditApprove</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_ReviewCompleted</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="StartEvent_ReviewSubmitted" name="Review Request Initiated"/>
+    <bpmn:task id="Task_SubmitReviewRequest" name="Submit Review Request"/>
+    <bpmn:task id="Task_ValidatePortfolioDocs" name="Validate Request Documentation"/>
+    <bpmn:exclusiveGateway id="Gateway_PortfolioReady" name="Ready for Review?" default="Flow_PortfolioReady_No"/>
+    <bpmn:task id="Task_ConductPortfolioReview" name="Conduct Portfolio Review"/>
+    <bpmn:exclusiveGateway id="Gateway_RequireEscalation" name="Require Escalation?"/>
+    <bpmn:task id="Task_ApprovePortfolioReview" name="Approve Review"/>
+    <bpmn:task id="Task_NotifySAODT" name="Notify SA and ODT(s)"/>
+
+    <bpmn:task id="Task_EscalateToSA" name="Escalate Review to SA"/>
+    <bpmn:task id="Task_ValidateSADocs" name="Validate Documentation"/>
+    <bpmn:exclusiveGateway id="Gateway_SAReady" name="Ready for Review?" default="Flow_SAReady_No"/>
+    <bpmn:task id="Task_ConductSAReview" name="Conduct Solution Architecture Review"/>
+    <bpmn:exclusiveGateway id="Gateway_RequireODTAdvice" name="Require ODT Advice?"/>
+    <bpmn:task id="Task_ODTAdvises" name="ODT Advises SA and APT on Review"/>
+    <bpmn:exclusiveGateway id="Gateway_SAApproved" name="Review Approved?"/>
+    <bpmn:task id="Task_NotifyAPTODT" name="Notify APT and ODT(s)"/>
+
+    <bpmn:task id="Task_ITGAuditApprove" name="Audit and Approve Tollgate"/>
+    <bpmn:endEvent id="EndEvent_ReviewCompleted" name="Review Completed"/>
+
+    <bpmn:sequenceFlow id="Flow_Start_Submit" sourceRef="StartEvent_ReviewSubmitted" targetRef="Task_SubmitReviewRequest"/>
+    <bpmn:sequenceFlow id="Flow_Submit_ValidatePortfolio" sourceRef="Task_SubmitReviewRequest" targetRef="Task_ValidatePortfolioDocs"/>
+    <bpmn:sequenceFlow id="Flow_ValidatePortfolio_Ready" sourceRef="Task_ValidatePortfolioDocs" targetRef="Gateway_PortfolioReady"/>
+    <bpmn:sequenceFlow id="Flow_PortfolioReady_Yes" name="Yes" sourceRef="Gateway_PortfolioReady" targetRef="Task_ConductPortfolioReview">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[ready = true]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_PortfolioReady_No" name="No - Revise Documentation" sourceRef="Gateway_PortfolioReady" targetRef="Task_SubmitReviewRequest"/>
+    <bpmn:sequenceFlow id="Flow_ConductPortfolio_Escalation" sourceRef="Task_ConductPortfolioReview" targetRef="Gateway_RequireEscalation"/>
+    <bpmn:sequenceFlow id="Flow_Escalation_No" name="No" sourceRef="Gateway_RequireEscalation" targetRef="Task_ApprovePortfolioReview">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[escalationRequired = false]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_Escalation_Yes" name="Yes" sourceRef="Gateway_RequireEscalation" targetRef="Task_EscalateToSA">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[escalationRequired = true]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_ApprovePortfolio_Notify" sourceRef="Task_ApprovePortfolioReview" targetRef="Task_NotifySAODT"/>
+    <bpmn:sequenceFlow id="Flow_NotifyPortfolio_ITG" sourceRef="Task_NotifySAODT" targetRef="Task_ITGAuditApprove"/>
+
+    <bpmn:sequenceFlow id="Flow_Escalate_ValidateSA" sourceRef="Task_EscalateToSA" targetRef="Task_ValidateSADocs"/>
+    <bpmn:sequenceFlow id="Flow_ValidateSA_Ready" sourceRef="Task_ValidateSADocs" targetRef="Gateway_SAReady"/>
+    <bpmn:sequenceFlow id="Flow_SAReady_Yes" name="Yes" sourceRef="Gateway_SAReady" targetRef="Task_ConductSAReview">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[ready = true]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_SAReady_No" name="No - Revise Documentation" sourceRef="Gateway_SAReady" targetRef="Task_ValidateSADocs"/>
+    <bpmn:sequenceFlow id="Flow_ConductSA_ODT" sourceRef="Task_ConductSAReview" targetRef="Gateway_RequireODTAdvice"/>
+    <bpmn:sequenceFlow id="Flow_ODT_No" name="No" sourceRef="Gateway_RequireODTAdvice" targetRef="Gateway_SAApproved">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[odtAdviceRequired = false]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_ODT_Yes" name="Yes" sourceRef="Gateway_RequireODTAdvice" targetRef="Task_ODTAdvises">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[odtAdviceRequired = true]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_ODTAdvice_BackToSAReview" sourceRef="Task_ODTAdvises" targetRef="Task_ConductSAReview"/>
+    <bpmn:sequenceFlow id="Flow_SAApproved_Yes" name="Yes" sourceRef="Gateway_SAApproved" targetRef="Task_NotifyAPTODT">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[approved = true]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_SAApproved_No" name="No" sourceRef="Gateway_SAApproved" targetRef="Task_ConductSAReview">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression"><![CDATA[approved = false]]></bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_NotifySA_ITG" sourceRef="Task_NotifyAPTODT" targetRef="Task_ITGAuditApprove"/>
+    <bpmn:sequenceFlow id="Flow_ITG_End" sourceRef="Task_ITGAuditApprove" targetRef="EndEvent_ReviewCompleted"/>
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_FederatedArchitectureReview">
+    <bpmndi:BPMNPlane id="BPMNPlane_FederatedArchitectureReview" bpmnElement="Collaboration_FederatedArchitectureReview">
+      <bpmndi:BPMNShape id="ParticipantShape" bpmnElement="Participant_FederatedArchitectureReview" isHorizontal="true">
+        <dc:Bounds x="100" y="80" width="1800" height="760"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneAPTShape" bpmnElement="Lane_APT" isHorizontal="true">
+        <dc:Bounds x="130" y="80" width="1770" height="190"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneSAShape" bpmnElement="Lane_SA" isHorizontal="true">
+        <dc:Bounds x="130" y="270" width="1770" height="230"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneODTShape" bpmnElement="Lane_ODT" isHorizontal="true">
+        <dc:Bounds x="130" y="500" width="1770" height="150"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="LaneITGShape" bpmnElement="Lane_ITG" isHorizontal="true">
+        <dc:Bounds x="130" y="650" width="1770" height="190"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="StartShape" bpmnElement="StartEvent_ReviewSubmitted"><dc:Bounds x="180" y="145" width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubmitShape" bpmnElement="Task_SubmitReviewRequest"><dc:Bounds x="250" y="120" width="130" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ValidatePortfolioShape" bpmnElement="Task_ValidatePortfolioDocs"><dc:Bounds x="420" y="120" width="150" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PortfolioReadyShape" bpmnElement="Gateway_PortfolioReady" isMarkerVisible="true"><dc:Bounds x="610" y="135" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConductPortfolioShape" bpmnElement="Task_ConductPortfolioReview"><dc:Bounds x="710" y="120" width="150" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EscalationGatewayShape" bpmnElement="Gateway_RequireEscalation" isMarkerVisible="true"><dc:Bounds x="910" y="135" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ApprovePortfolioShape" bpmnElement="Task_ApprovePortfolioReview"><dc:Bounds x="1010" y="105" width="140" height="70"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="NotifySAODTShape" bpmnElement="Task_NotifySAODT"><dc:Bounds x="1210" y="105" width="150" height="70"/></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EscalateToSAShape" bpmnElement="Task_EscalateToSA"><dc:Bounds x="1010" y="320" width="150" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ValidateSAShape" bpmnElement="Task_ValidateSADocs"><dc:Bounds x="1210" y="320" width="150" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SAReadyShape" bpmnElement="Gateway_SAReady" isMarkerVisible="true"><dc:Bounds x="1410" y="335" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ConductSAShape" bpmnElement="Task_ConductSAReview"><dc:Bounds x="1510" y="320" width="160" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ODTGatewayShape" bpmnElement="Gateway_RequireODTAdvice" isMarkerVisible="true"><dc:Bounds x="1710" y="335" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SAApprovedShape" bpmnElement="Gateway_SAApproved" isMarkerVisible="true"><dc:Bounds x="1510" y="420" width="50" height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="NotifyAPTODTShape" bpmnElement="Task_NotifyAPTODT"><dc:Bounds x="1660" y="415" width="150" height="70"/></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="ODTAdvisesShape" bpmnElement="Task_ODTAdvises"><dc:Bounds x="1680" y="535" width="170" height="80"/></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="ITGAuditShape" bpmnElement="Task_ITGAuditApprove"><dc:Bounds x="1510" y="700" width="180" height="80"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndShape" bpmnElement="EndEvent_ReviewCompleted"><dc:Bounds x="1750" y="722" width="36" height="36"/></bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Edge_Start_Submit" bpmnElement="Flow_Start_Submit"><di:waypoint x="216" y="163"/><di:waypoint x="250" y="160"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Submit_Validate" bpmnElement="Flow_Submit_ValidatePortfolio"><di:waypoint x="380" y="160"/><di:waypoint x="420" y="160"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Validate_Ready" bpmnElement="Flow_ValidatePortfolio_Ready"><di:waypoint x="570" y="160"/><di:waypoint x="610" y="160"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Ready_Yes" bpmnElement="Flow_PortfolioReady_Yes"><di:waypoint x="660" y="160"/><di:waypoint x="710" y="160"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Ready_No" bpmnElement="Flow_PortfolioReady_No"><di:waypoint x="635" y="135"/><di:waypoint x="635" y="95"/><di:waypoint x="315" y="95"/><di:waypoint x="315" y="120"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Conduct_Esc" bpmnElement="Flow_ConductPortfolio_Escalation"><di:waypoint x="860" y="160"/><di:waypoint x="910" y="160"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Esc_No" bpmnElement="Flow_Escalation_No"><di:waypoint x="960" y="160"/><di:waypoint x="1010" y="140"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Esc_Yes" bpmnElement="Flow_Escalation_Yes"><di:waypoint x="935" y="185"/><di:waypoint x="935" y="360"/><di:waypoint x="1010" y="360"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Approve_Notify" bpmnElement="Flow_ApprovePortfolio_Notify"><di:waypoint x="1150" y="140"/><di:waypoint x="1210" y="140"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_Notify_ITG" bpmnElement="Flow_NotifyPortfolio_ITG"><di:waypoint x="1285" y="175"/><di:waypoint x="1285" y="740"/><di:waypoint x="1510" y="740"/></bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Edge_Esc_ValidateSA" bpmnElement="Flow_Escalate_ValidateSA"><di:waypoint x="1160" y="360"/><di:waypoint x="1210" y="360"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ValidateSA_Ready" bpmnElement="Flow_ValidateSA_Ready"><di:waypoint x="1360" y="360"/><di:waypoint x="1410" y="360"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SAReady_Yes" bpmnElement="Flow_SAReady_Yes"><di:waypoint x="1460" y="360"/><di:waypoint x="1510" y="360"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SAReady_No" bpmnElement="Flow_SAReady_No"><di:waypoint x="1435" y="335"/><di:waypoint x="1435" y="295"/><di:waypoint x="1285" y="295"/><di:waypoint x="1285" y="320"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ConductSA_ODT" bpmnElement="Flow_ConductSA_ODT"><di:waypoint x="1670" y="360"/><di:waypoint x="1710" y="360"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ODT_No" bpmnElement="Flow_ODT_No"><di:waypoint x="1735" y="385"/><di:waypoint x="1735" y="445"/><di:waypoint x="1560" y="445"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ODT_Yes" bpmnElement="Flow_ODT_Yes"><di:waypoint x="1735" y="385"/><di:waypoint x="1735" y="535"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ODT_Back" bpmnElement="Flow_ODTAdvice_BackToSAReview"><di:waypoint x="1680" y="575"/><di:waypoint x="1590" y="575"/><di:waypoint x="1590" y="400"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SAApproved_Yes" bpmnElement="Flow_SAApproved_Yes"><di:waypoint x="1560" y="445"/><di:waypoint x="1660" y="450"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_SAApproved_No" bpmnElement="Flow_SAApproved_No"><di:waypoint x="1535" y="420"/><di:waypoint x="1535" y="400"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_NotifySA_ITG" bpmnElement="Flow_NotifySA_ITG"><di:waypoint x="1735" y="485"/><di:waypoint x="1735" y="740"/><di:waypoint x="1690" y="740"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_ITG_End" bpmnElement="Flow_ITG_End"><di:waypoint x="1690" y="740"/><di:waypoint x="1750" y="740"/></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
