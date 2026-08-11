@@ -1,0 +1,64 @@
+schema-version: "1.0"
+catalog-version: "1.0"
+generated-date: "2026-08-11"
+
+name: "Enterprise Architecture Pattern Catalog"
+
+delivery-phases:
+  1:
+    name: "Federated Assurance Foundation"
+    objective: "Establish core guardrails needed for architecture self-service."
+
+  2:
+    name: "Engineering Standardization"
+    objective: "Expand assurance into broader application, data and platform engineering."
+
+  3:
+    name: "Advanced Architecture"
+    objective: "Formalize advanced, specialized and transformation-oriented patterns."
+
+patterns:
+
+  - id: "integration.synchronous.rest-api"
+    title: "Rest Api"
+    path: "integration/synchronous/rest-api.md"
+    domain: "Integration"
+    category: "Synchronous"
+    type: "Integration Pattern"
+    phase: 1
+    status: "Placeholder"
+    assurance-impact: "GREEN"
+    owner: "Enterprise Architecture"
+
+  - id: "integration.asynchronous.event-driven-architecture"
+    title: "Event Driven Architecture"
+    path: "integration/asynchronous/event-driven-architecture.md"
+    domain: "Integration"
+    category: "Asynchronous"
+    type: "Integration Pattern"
+    phase: 1
+    status: "Placeholder"
+    assurance-impact: "GREEN"
+
+  - id: "data.distributed-data.event-sourcing"
+    title: "Event Sourcing"
+    path: "data/distributed-data/event-sourcing.md"
+    domain: "Data"
+    category: "Distributed Data"
+    type: "Data Pattern"
+    phase: 3
+    status: "Placeholder"
+    assurance-impact: "RED"
+
+assurance:
+  default: GREEN
+
+  elevate-to-amber-when:
+    - "contains-restricted-data"
+    - "external-party-integration"
+    - "standards-exception"
+
+  elevate-to-red-when:
+    - "internet-facing-critical-service"
+    - "new-enterprise-technology"
+    - "cross-domain-system-of-record"
