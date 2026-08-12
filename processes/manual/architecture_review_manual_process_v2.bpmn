@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    id="Definitions_ArchitectureReview"
+    targetNamespace="http://example.com/architecture-review">
+
+  <bpmn:process id="Process_ArchitectureReview" name="Architecture Review - Manual Tracking" isExecutable="false">
+
+    <bpmn:laneSet id="LaneSet_ArchitectureReview">
+      <bpmn:lane id="Lane_APT" name="APT / Requestor">
+        <bpmn:flowNodeRef>Task_SubmitARR</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_UploadDocs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_UpdateInfo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CreatePC2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_UpdateGovDocs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_UpdateSolution</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_SA" name="Solution Architecture">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CreateJira</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CreateAPTSubtask</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ReviewSubmission</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Ready</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_MarkInProgress</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ScheduleReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ODTRequired</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CreateODTSubtasks</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ArchitectureReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RecordODTDecision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_NotifyAPT</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CreateITGSubtask</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_TechnicalRereview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RecordGovDecision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CloseReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_1</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_ODT" name="Operational Domain Team (ODT)">
+        <bpmn:flowNodeRef>Task_ODTReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ODTApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DocumentODTDecision</bpmn:flowNodeRef>
+      </bpmn:lane>
+
+      <bpmn:lane id="Lane_ITG" name="IT Governance">
+        <bpmn:flowNodeRef>Task_GovReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_GovApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DocumentGovApproval</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_DocumentGovRejection</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <bpmn:startEvent id="StartEvent_1" name="Architecture Review Requested">
+      <bpmn:outgoing>Flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+
+    <bpmn:userTask id="Task_SubmitARR" name="Submit ARR via MS Form">
+      <bpmn:incoming>Flow_01</bpmn:incoming>
+      <bpmn:outgoing>Flow_02</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_CreateJira" name="Create Jira Architecture Review">
+      <bpmn:incoming>Flow_02</bpmn:incoming>
+      <bpmn:outgoing>Flow_03</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_CreateAPTSubtask" name="Create APT Sub-task">
+      <bpmn:incoming>Flow_03</bpmn:incoming>
+      <bpmn:outgoing>Flow_04</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_UploadDocs" name="Upload Supporting Documentation">
+      <bpmn:incoming>Flow_04</bpmn:incoming>
+      <bpmn:outgoing>Flow_05</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_ReviewSubmission" name="Review Submission">
+      <bpmn:incoming>Flow_05</bpmn:incoming>
+      <bpmn:incoming>Flow_08</bpmn:incoming>
+      <bpmn:outgoing>Flow_06</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_Ready" name="Ready for Review?" default="Flow_07_No">
+      <bpmn:incoming>Flow_06</bpmn:incoming>
+      <bpmn:outgoing>Flow_07_Yes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_07_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_UpdateInfo" name="Provide Missing / Updated Information">
+      <bpmn:incoming>Flow_07_No</bpmn:incoming>
+      <bpmn:incoming>Flow_18_No</bpmn:incoming>
+      <bpmn:incoming>Flow_28_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_08</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_MarkInProgress" name="Mark Review In Progress">
+      <bpmn:incoming>Flow_07_Yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_09</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_ScheduleReview" name="Schedule Architecture Review">
+      <bpmn:incoming>Flow_09</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_ArchitectureReview" name="Conduct Architecture Review">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:incoming>Flow_31</bpmn:incoming>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_ODTRequired" name="ODT Review Required?" default="Flow_12_No">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_12_Yes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_12_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_CreateODTSubtasks" name="Create Required ODT Sub-task(s)">
+      <bpmn:incoming>Flow_12_Yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_ODTReview" name="Conduct ODT Review">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="false"/>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_ODTApproved" name="ODT Approved?" default="Flow_18_No">
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_15_Yes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_18_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_DocumentODTDecision" name="Document ODT Approval / Decision">
+      <bpmn:incoming>Flow_15_Yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_RecordODTDecision" name="Record ODT Decision in Parent Jira">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_17</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_NotifyAPT" name="Notify APT of Architecture Review Results">
+      <bpmn:incoming>Flow_17</bpmn:incoming>
+      <bpmn:incoming>Flow_12_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_19</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_CreatePC2" name="Create PC2 Governance Tracking Entry">
+      <bpmn:incoming>Flow_19</bpmn:incoming>
+      <bpmn:outgoing>Flow_20</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_CreateITGSubtask" name="Create IT Governance Sub-task and Notify Contact">
+      <bpmn:incoming>Flow_20</bpmn:incoming>
+      <bpmn:outgoing>Flow_21</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_GovReview" name="Conduct Governance Review">
+      <bpmn:incoming>Flow_21</bpmn:incoming>
+      <bpmn:incoming>Flow_30</bpmn:incoming>
+      <bpmn:outgoing>Flow_22</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_GovApproved" name="Governance Approved?" default="Flow_23_No">
+      <bpmn:incoming>Flow_22</bpmn:incoming>
+      <bpmn:outgoing>Flow_23_Yes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_23_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_DocumentGovRejection" name="Document Governance Rejection / Required Changes">
+      <bpmn:incoming>Flow_23_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_27</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:exclusiveGateway id="Gateway_TechnicalRereview" name="Technical Re-review Required?" default="Flow_29_No">
+      <bpmn:incoming>Flow_27</bpmn:incoming>
+      <bpmn:outgoing>Flow_29_Yes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_29_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+
+    <bpmn:userTask id="Task_UpdateGovDocs" name="Update Governance Documentation">
+      <bpmn:incoming>Flow_29_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_30</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_UpdateSolution" name="Update Solution / Architecture Documentation">
+      <bpmn:incoming>Flow_29_Yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_31</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_DocumentGovApproval" name="Document Final Governance Approval">
+      <bpmn:incoming>Flow_23_Yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_24</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_RecordGovDecision" name="Record Governance Decision in Parent Jira">
+      <bpmn:incoming>Flow_24</bpmn:incoming>
+      <bpmn:outgoing>Flow_25</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:userTask id="Task_CloseReview" name="Mark ar-complete and Close Jira Tasks">
+      <bpmn:incoming>Flow_25</bpmn:incoming>
+      <bpmn:outgoing>Flow_26</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <bpmn:endEvent id="EndEvent_1" name="Architecture Review Complete">
+      <bpmn:incoming>Flow_26</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="StartEvent_1" targetRef="Task_SubmitARR"/>
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_SubmitARR" targetRef="Task_CreateJira"/>
+    <bpmn:sequenceFlow id="Flow_03" sourceRef="Task_CreateJira" targetRef="Task_CreateAPTSubtask"/>
+    <bpmn:sequenceFlow id="Flow_04" sourceRef="Task_CreateAPTSubtask" targetRef="Task_UploadDocs"/>
+    <bpmn:sequenceFlow id="Flow_05" sourceRef="Task_UploadDocs" targetRef="Task_ReviewSubmission"/>
+    <bpmn:sequenceFlow id="Flow_06" sourceRef="Task_ReviewSubmission" targetRef="Gateway_Ready"/>
+    <bpmn:sequenceFlow id="Flow_07_Yes" name="Yes" sourceRef="Gateway_Ready" targetRef="Task_MarkInProgress">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${readyForReview == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_07_No" name="No" sourceRef="Gateway_Ready" targetRef="Task_UpdateInfo"/>
+    <bpmn:sequenceFlow id="Flow_08" sourceRef="Task_UpdateInfo" targetRef="Task_ReviewSubmission"/>
+    <bpmn:sequenceFlow id="Flow_09" sourceRef="Task_MarkInProgress" targetRef="Task_ScheduleReview"/>
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_ScheduleReview" targetRef="Task_ArchitectureReview"/>
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Task_ArchitectureReview" targetRef="Gateway_ODTRequired"/>
+    <bpmn:sequenceFlow id="Flow_12_Yes" name="Yes" sourceRef="Gateway_ODTRequired" targetRef="Task_CreateODTSubtasks">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${odtRequired == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_12_No" name="No" sourceRef="Gateway_ODTRequired" targetRef="Task_NotifyAPT"/>
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_CreateODTSubtasks" targetRef="Task_ODTReview"/>
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_ODTReview" targetRef="Gateway_ODTApproved"/>
+    <bpmn:sequenceFlow id="Flow_15_Yes" name="Yes" sourceRef="Gateway_ODTApproved" targetRef="Task_DocumentODTDecision">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${odtApproved == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_DocumentODTDecision" targetRef="Task_RecordODTDecision"/>
+    <bpmn:sequenceFlow id="Flow_17" sourceRef="Task_RecordODTDecision" targetRef="Task_NotifyAPT"/>
+    <bpmn:sequenceFlow id="Flow_18_No" name="No - Rework" sourceRef="Gateway_ODTApproved" targetRef="Task_UpdateInfo"/>
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="Task_NotifyAPT" targetRef="Task_CreatePC2"/>
+    <bpmn:sequenceFlow id="Flow_20" sourceRef="Task_CreatePC2" targetRef="Task_CreateITGSubtask"/>
+    <bpmn:sequenceFlow id="Flow_21" sourceRef="Task_CreateITGSubtask" targetRef="Task_GovReview"/>
+    <bpmn:sequenceFlow id="Flow_22" sourceRef="Task_GovReview" targetRef="Gateway_GovApproved"/>
+    <bpmn:sequenceFlow id="Flow_23_Yes" name="Yes" sourceRef="Gateway_GovApproved" targetRef="Task_DocumentGovApproval">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${governanceApproved == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_24" sourceRef="Task_DocumentGovApproval" targetRef="Task_RecordGovDecision"/>
+    <bpmn:sequenceFlow id="Flow_25" sourceRef="Task_RecordGovDecision" targetRef="Task_CloseReview"/>
+    <bpmn:sequenceFlow id="Flow_26" sourceRef="Task_CloseReview" targetRef="EndEvent_1"/>
+    <bpmn:sequenceFlow id="Flow_23_No" name="No" sourceRef="Gateway_GovApproved" targetRef="Task_DocumentGovRejection"/>
+    <bpmn:sequenceFlow id="Flow_27" sourceRef="Task_DocumentGovRejection" targetRef="Gateway_TechnicalRereview"/>
+    <bpmn:sequenceFlow id="Flow_29_Yes" name="Yes - Material Change" sourceRef="Gateway_TechnicalRereview" targetRef="Task_UpdateSolution">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${technicalRereviewRequired == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_29_No" name="No - Documentation Only" sourceRef="Gateway_TechnicalRereview" targetRef="Task_UpdateGovDocs"/>
+    <bpmn:sequenceFlow id="Flow_30" sourceRef="Task_UpdateGovDocs" targetRef="Task_GovReview"/>
+    <bpmn:sequenceFlow id="Flow_31" sourceRef="Task_UpdateSolution" targetRef="Task_ArchitectureReview"/>
+
+  </bpmn:process>
+
+  <bpmn:collaboration id="Collaboration_ArchitectureReview">
+    <bpmn:participant id="Participant_ArchitectureReview" name="Architecture Review - Manual Process" processRef="Process_ArchitectureReview"/>
+  </bpmn:collaboration>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_ArchitectureReview">
+    <bpmndi:BPMNPlane id="BPMNPlane_ArchitectureReview" bpmnElement="Collaboration_ArchitectureReview">
+
+      <bpmndi:BPMNShape id="Participant_ArchitectureReview_di" bpmnElement="Participant_ArchitectureReview" isHorizontal="true">
+        <dc:Bounds x="40" y="40" width="3660" height="720"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Lane_APT_di" bpmnElement="Lane_APT" isHorizontal="true">
+        <dc:Bounds x="70" y="40" width="3630" height="180"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SA_di" bpmnElement="Lane_SA" isHorizontal="true">
+        <dc:Bounds x="70" y="220" width="3630" height="220"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_ODT_di" bpmnElement="Lane_ODT" isHorizontal="true">
+        <dc:Bounds x="70" y="440" width="3630" height="150"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_ITG_di" bpmnElement="Lane_ITG" isHorizontal="true">
+        <dc:Bounds x="70" y="590" width="3630" height="170"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="105" y="305" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_SubmitARR_di" bpmnElement="Task_SubmitARR">
+        <dc:Bounds x="180" y="90" width="130" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateJira_di" bpmnElement="Task_CreateJira">
+        <dc:Bounds x="350" y="275" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateAPTSubtask_di" bpmnElement="Task_CreateAPTSubtask">
+        <dc:Bounds x="530" y="275" width="130" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_UploadDocs_di" bpmnElement="Task_UploadDocs">
+        <dc:Bounds x="700" y="90" width="145" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReviewSubmission_di" bpmnElement="Task_ReviewSubmission">
+        <dc:Bounds x="885" y="275" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Ready_di" bpmnElement="Gateway_Ready" isMarkerVisible="true">
+        <dc:Bounds x="1065" y="290" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_UpdateInfo_di" bpmnElement="Task_UpdateInfo">
+        <dc:Bounds x="1040" y="90" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_MarkInProgress_di" bpmnElement="Task_MarkInProgress">
+        <dc:Bounds x="1160" y="275" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ScheduleReview_di" bpmnElement="Task_ScheduleReview">
+        <dc:Bounds x="1340" y="275" width="145" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ArchitectureReview_di" bpmnElement="Task_ArchitectureReview">
+        <dc:Bounds x="1525" y="275" width="145" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ODTRequired_di" bpmnElement="Gateway_ODTRequired" isMarkerVisible="true">
+        <dc:Bounds x="1710" y="290" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateODTSubtasks_di" bpmnElement="Task_CreateODTSubtasks">
+        <dc:Bounds x="1805" y="275" width="155" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ODTReview_di" bpmnElement="Task_ODTReview">
+        <dc:Bounds x="2010" y="475" width="140" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ODTApproved_di" bpmnElement="Gateway_ODTApproved" isMarkerVisible="true">
+        <dc:Bounds x="2190" y="490" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DocumentODTDecision_di" bpmnElement="Task_DocumentODTDecision">
+        <dc:Bounds x="2285" y="475" width="160" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RecordODTDecision_di" bpmnElement="Task_RecordODTDecision">
+        <dc:Bounds x="2490" y="275" width="160" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotifyAPT_di" bpmnElement="Task_NotifyAPT">
+        <dc:Bounds x="2695" y="275" width="155" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreatePC2_di" bpmnElement="Task_CreatePC2">
+        <dc:Bounds x="2885" y="90" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateITGSubtask_di" bpmnElement="Task_CreateITGSubtask">
+        <dc:Bounds x="3070" y="275" width="170" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GovReview_di" bpmnElement="Task_GovReview">
+        <dc:Bounds x="3290" y="635" width="145" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_GovApproved_di" bpmnElement="Gateway_GovApproved" isMarkerVisible="true">
+        <dc:Bounds x="3480" y="650" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DocumentGovApproval_di" bpmnElement="Task_DocumentGovApproval">
+        <dc:Bounds x="3570" y="635" width="150" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_DocumentGovRejection_di" bpmnElement="Task_DocumentGovRejection">
+        <dc:Bounds x="3570" y="705" width="160" height="45"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_TechnicalRereview_di" bpmnElement="Gateway_TechnicalRereview" isMarkerVisible="true">
+        <dc:Bounds x="3370" y="500" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_UpdateGovDocs_di" bpmnElement="Task_UpdateGovDocs">
+        <dc:Bounds x="3075" y="90" width="165" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_UpdateSolution_di" bpmnElement="Task_UpdateSolution">
+        <dc:Bounds x="1450" y="90" width="175" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- The final SA tasks are placed back in the SA lane and route left-to-right via bends -->
+      <bpmndi:BPMNShape id="Task_RecordGovDecision_di" bpmnElement="Task_RecordGovDecision">
+        <dc:Bounds x="3290" y="365" width="155" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CloseReview_di" bpmnElement="Task_CloseReview">
+        <dc:Bounds x="3490" y="365" width="150" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="3655" y="377" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="Flow_01_di" bpmnElement="Flow_01">
+        <di:waypoint x="141" y="323"/><di:waypoint x="160" y="323"/><di:waypoint x="160" y="130"/><di:waypoint x="180" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02_di" bpmnElement="Flow_02">
+        <di:waypoint x="310" y="130"/><di:waypoint x="330" y="130"/><di:waypoint x="330" y="315"/><di:waypoint x="350" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03_di" bpmnElement="Flow_03">
+        <di:waypoint x="490" y="315"/><di:waypoint x="530" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04_di" bpmnElement="Flow_04">
+        <di:waypoint x="660" y="315"/><di:waypoint x="680" y="315"/><di:waypoint x="680" y="130"/><di:waypoint x="700" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05_di" bpmnElement="Flow_05">
+        <di:waypoint x="845" y="130"/><di:waypoint x="865" y="130"/><di:waypoint x="865" y="315"/><di:waypoint x="885" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06_di" bpmnElement="Flow_06">
+        <di:waypoint x="1025" y="315"/><di:waypoint x="1065" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07_Yes_di" bpmnElement="Flow_07_Yes">
+        <di:waypoint x="1115" y="315"/><di:waypoint x="1160" y="315"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1122" y="292" width="24" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07_No_di" bpmnElement="Flow_07_No">
+        <di:waypoint x="1090" y="290"/><di:waypoint x="1090" y="170"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1096" y="222" width="20" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08_di" bpmnElement="Flow_08">
+        <di:waypoint x="1040" y="130"/><di:waypoint x="955" y="130"/><di:waypoint x="955" y="275"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09_di" bpmnElement="Flow_09">
+        <di:waypoint x="1300" y="315"/><di:waypoint x="1340" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="1485" y="315"/><di:waypoint x="1525" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="1670" y="315"/><di:waypoint x="1710" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_Yes_di" bpmnElement="Flow_12_Yes">
+        <di:waypoint x="1760" y="315"/><di:waypoint x="1805" y="315"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1770" y="292" width="24" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_No_di" bpmnElement="Flow_12_No">
+        <di:waypoint x="1735" y="290"/><di:waypoint x="1735" y="245"/><di:waypoint x="2772" y="245"/><di:waypoint x="2772" y="275"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="2210" y="224" width="20" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="1960" y="315"/><di:waypoint x="1985" y="315"/><di:waypoint x="1985" y="515"/><di:waypoint x="2010" y="515"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="2150" y="515"/><di:waypoint x="2190" y="515"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_Yes_di" bpmnElement="Flow_15_Yes">
+        <di:waypoint x="2240" y="515"/><di:waypoint x="2285" y="515"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="2250" y="492" width="24" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="2445" y="515"/><di:waypoint x="2468" y="515"/><di:waypoint x="2468" y="315"/><di:waypoint x="2490" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17">
+        <di:waypoint x="2650" y="315"/><di:waypoint x="2695" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18_No_di" bpmnElement="Flow_18_No">
+        <di:waypoint x="2215" y="490"/><di:waypoint x="2215" y="195"/><di:waypoint x="1115" y="195"/><di:waypoint x="1115" y="170"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="1640" y="175" width="75" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19">
+        <di:waypoint x="2850" y="315"/><di:waypoint x="2868" y="315"/><di:waypoint x="2868" y="130"/><di:waypoint x="2885" y="130"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_20_di" bpmnElement="Flow_20">
+        <di:waypoint x="3035" y="130"/><di:waypoint x="3050" y="130"/><di:waypoint x="3050" y="315"/><di:waypoint x="3070" y="315"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_21_di" bpmnElement="Flow_21">
+        <di:waypoint x="3240" y="315"/><di:waypoint x="3265" y="315"/><di:waypoint x="3265" y="675"/><di:waypoint x="3290" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_22_di" bpmnElement="Flow_22">
+        <di:waypoint x="3435" y="675"/><di:waypoint x="3480" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_23_Yes_di" bpmnElement="Flow_23_Yes">
+        <di:waypoint x="3530" y="675"/><di:waypoint x="3570" y="675"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="3540" y="652" width="24" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_24_di" bpmnElement="Flow_24">
+        <di:waypoint x="3645" y="635"/><di:waypoint x="3645" y="450"/><di:waypoint x="3368" y="450"/><di:waypoint x="3368" y="425"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_25_di" bpmnElement="Flow_25">
+        <di:waypoint x="3445" y="395"/><di:waypoint x="3490" y="395"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_26_di" bpmnElement="Flow_26">
+        <di:waypoint x="3640" y="395"/><di:waypoint x="3655" y="395"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_23_No_di" bpmnElement="Flow_23_No">
+        <di:waypoint x="3505" y="700"/><di:waypoint x="3505" y="727"/><di:waypoint x="3570" y="727"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="3515" y="706" width="20" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_27_di" bpmnElement="Flow_27">
+        <di:waypoint x="3570" y="727"/><di:waypoint x="3395" y="727"/><di:waypoint x="3395" y="550"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_29_No_di" bpmnElement="Flow_29_No">
+        <di:waypoint x="3370" y="525"/><di:waypoint x="3158" y="525"/><di:waypoint x="3158" y="170"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="3200" y="505" width="130" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_30_di" bpmnElement="Flow_30">
+        <di:waypoint x="3240" y="130"/><di:waypoint x="3260" y="130"/><di:waypoint x="3260" y="675"/><di:waypoint x="3290" y="675"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_29_Yes_di" bpmnElement="Flow_29_Yes">
+        <di:waypoint x="3395" y="500"/><di:waypoint x="3395" y="185"/><di:waypoint x="1538" y="185"/><di:waypoint x="1538" y="170"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="2400" y="165" width="120" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_31_di" bpmnElement="Flow_31">
+        <di:waypoint x="1538" y="170"/><di:waypoint x="1538" y="235"/><di:waypoint x="1598" y="235"/><di:waypoint x="1598" y="275"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
