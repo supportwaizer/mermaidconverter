@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_FederatedArchitectureReview_v2" targetNamespace="http://example.com/federated-architecture-review/v2">
+  <bpmn:collaboration id="Collaboration_FAR">
+    <bpmn:participant id="Participant_FAR" name="Federated Architecture Review" processRef="Process_FAR"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Process_FAR" name="Federated Architecture Review - Enriched with Manual Tracking Tasks" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_FAR">
+      <bpmn:lane id="Lane_APT" name="APT / Portfolio Review">
+        <bpmn:flowNodeRef>Start_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Submit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_CreateJira</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_CreateAPTSubtask</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_UploadDocs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ValidateAPT</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_APTReady</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_UpdateInfo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_MarkAPTInProgress</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ScheduleAPT</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ConductAPT</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_Escalate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ApproveAPT</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_RecordAPT</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_NotifySAODT</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_Escalate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_CreatePC2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_CreateITGSub</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_UpdateGovDocs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_UpdateSolution</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_RecordGov</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_CloseJira</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_SA" name="Solution Architecture (SA)">
+        <bpmn:flowNodeRef>T_ValidateSA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_SAReady</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_MarkSAInProgress</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ScheduleSA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ConductSA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_ODTRequired</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_CreateODTSubs</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_RecordODT</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_SAApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_NotifyAPTODT</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_ODT" name="Operational Domain Team (ODT)">
+        <bpmn:flowNodeRef>T_ODTReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_ODTApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_DocODT</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_ITG" name="IT Governance (ITG)">
+        <bpmn:flowNodeRef>T_GovReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_GovApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_DocGovApprove</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_DocGovReject</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_TechRereview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Complete</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Review" name="Review Request Initiated"/>
+    <bpmn:userTask id="T_Submit" name="[1] Submit Review Request via MS Form"/>
+    <bpmn:userTask id="T_CreateJira" name="[1a] Create Jira Architecture Review Record"/>
+    <bpmn:userTask id="T_CreateAPTSubtask" name="[1b] Create APT Review Sub-task"/>
+    <bpmn:userTask id="T_UploadDocs" name="[1c] Upload Supporting Documentation"/>
+    <bpmn:userTask id="T_ValidateAPT" name="[2] Validate Request Documentation"/>
+    <bpmn:exclusiveGateway id="G_APTReady" name="[3] Ready for Review?" default="F07N"/>
+    <bpmn:userTask id="T_UpdateInfo" name="Provide Missing / Updated Information"/>
+    <bpmn:userTask id="T_MarkAPTInProgress" name="Mark Portfolio Review In Progress"/>
+    <bpmn:userTask id="T_ScheduleAPT" name="Schedule Review (if required)"/>
+    <bpmn:userTask id="T_ConductAPT" name="[4] Conduct Portfolio Review"/>
+    <bpmn:exclusiveGateway id="G_Escalate" name="[5] Require Escalation?"/>
+    <bpmn:userTask id="T_ApproveAPT" name="[7] Approve Review"/>
+    <bpmn:userTask id="T_RecordAPT" name="Record Portfolio Review Decision in Jira"/>
+    <bpmn:userTask id="T_NotifySAODT" name="[8] Notify SA and ODT(s)"/>
+    <bpmn:userTask id="T_Escalate" name="[6] Escalate Review to SA / Update Jira Assignment"/>
+    <bpmn:userTask id="T_ValidateSA" name="[6a] Validate Escalated Request Documentation"/>
+    <bpmn:exclusiveGateway id="G_SAReady" name="[6b] Ready for Review?" default="F18N"/>
+    <bpmn:userTask id="T_MarkSAInProgress" name="Mark SA Review In Progress"/>
+    <bpmn:userTask id="T_ScheduleSA" name="Schedule Architecture Review"/>
+    <bpmn:userTask id="T_ConductSA" name="[6c] Conduct Escalated Request SA Review"/>
+    <bpmn:exclusiveGateway id="G_ODTRequired" name="[6d] Require ODT Advice?"/>
+    <bpmn:userTask id="T_CreateODTSubs" name="Create Required ODT Sub-task(s)"/>
+    <bpmn:userTask id="T_RecordODT" name="Record ODT Decision in Parent Jira"/>
+    <bpmn:exclusiveGateway id="G_SAApproved" name="[6e] Review Approved?"/>
+    <bpmn:userTask id="T_NotifyAPTODT" name="[8a] Notify APT and ODT(s)"/>
+    <bpmn:userTask id="T_ODTReview" name="Conduct ODT Review"/>
+    <bpmn:exclusiveGateway id="G_ODTApproved" name="ODT Approved?"/>
+    <bpmn:userTask id="T_DocODT" name="Document ODT Approval / Decision"/>
+    <bpmn:userTask id="T_CreatePC2" name="Create PC2 Governance Tracking Entry"/>
+    <bpmn:userTask id="T_CreateITGSub" name="Create IT Governance Sub-task and Notify Contact"/>
+    <bpmn:userTask id="T_GovReview" name="[9] Conduct Governance Review / Audit Tollgate"/>
+    <bpmn:exclusiveGateway id="G_GovApproved" name="Governance Approved?"/>
+    <bpmn:userTask id="T_DocGovApprove" name="Document Final Governance Approval"/>
+    <bpmn:userTask id="T_DocGovReject" name="Document Governance Rejection / Required Changes"/>
+    <bpmn:exclusiveGateway id="G_TechRereview" name="Technical Re-review Required?"/>
+    <bpmn:userTask id="T_UpdateGovDocs" name="Update Governance Documentation"/>
+    <bpmn:userTask id="T_UpdateSolution" name="Update Solution / Architecture Documentation"/>
+    <bpmn:userTask id="T_RecordGov" name="Record Governance Decision in Parent Jira"/>
+    <bpmn:userTask id="T_CloseJira" name="Mark ar-complete and Close Jira Tasks"/>
+    <bpmn:endEvent id="End_Complete" name="Review Completed"/>
+    <bpmn:sequenceFlow id="F01" sourceRef="Start_Review" targetRef="T_Submit"/>
+    <bpmn:sequenceFlow id="F02" sourceRef="T_Submit" targetRef="T_CreateJira"/>
+    <bpmn:sequenceFlow id="F03" sourceRef="T_CreateJira" targetRef="T_CreateAPTSubtask"/>
+    <bpmn:sequenceFlow id="F04" sourceRef="T_CreateAPTSubtask" targetRef="T_UploadDocs"/>
+    <bpmn:sequenceFlow id="F05" sourceRef="T_UploadDocs" targetRef="T_ValidateAPT"/>
+    <bpmn:sequenceFlow id="F06" sourceRef="T_ValidateAPT" targetRef="G_APTReady"/>
+    <bpmn:sequenceFlow id="F07Y" sourceRef="G_APTReady" targetRef="T_MarkAPTInProgress" name="Yes"/>
+    <bpmn:sequenceFlow id="F07N" sourceRef="G_APTReady" targetRef="T_UpdateInfo" name="No - Revise Documentation"/>
+    <bpmn:sequenceFlow id="F08" sourceRef="T_UpdateInfo" targetRef="T_UploadDocs"/>
+    <bpmn:sequenceFlow id="F09" sourceRef="T_MarkAPTInProgress" targetRef="T_ScheduleAPT"/>
+    <bpmn:sequenceFlow id="F10" sourceRef="T_ScheduleAPT" targetRef="T_ConductAPT"/>
+    <bpmn:sequenceFlow id="F11" sourceRef="T_ConductAPT" targetRef="G_Escalate"/>
+    <bpmn:sequenceFlow id="F12N" sourceRef="G_Escalate" targetRef="T_ApproveAPT" name="No"/>
+    <bpmn:sequenceFlow id="F12Y" sourceRef="G_Escalate" targetRef="T_Escalate" name="Yes"/>
+    <bpmn:sequenceFlow id="F13" sourceRef="T_ApproveAPT" targetRef="T_RecordAPT"/>
+    <bpmn:sequenceFlow id="F14" sourceRef="T_RecordAPT" targetRef="T_NotifySAODT"/>
+    <bpmn:sequenceFlow id="F15" sourceRef="T_NotifySAODT" targetRef="T_CreatePC2"/>
+    <bpmn:sequenceFlow id="F16" sourceRef="T_Escalate" targetRef="T_ValidateSA"/>
+    <bpmn:sequenceFlow id="F17" sourceRef="T_ValidateSA" targetRef="G_SAReady"/>
+    <bpmn:sequenceFlow id="F18Y" sourceRef="G_SAReady" targetRef="T_MarkSAInProgress" name="Yes"/>
+    <bpmn:sequenceFlow id="F18N" sourceRef="G_SAReady" targetRef="T_UpdateInfo" name="No - Revise Documentation"/>
+    <bpmn:sequenceFlow id="F19" sourceRef="T_MarkSAInProgress" targetRef="T_ScheduleSA"/>
+    <bpmn:sequenceFlow id="F20" sourceRef="T_ScheduleSA" targetRef="T_ConductSA"/>
+    <bpmn:sequenceFlow id="F21" sourceRef="T_ConductSA" targetRef="G_ODTRequired"/>
+    <bpmn:sequenceFlow id="F22N" sourceRef="G_ODTRequired" targetRef="G_SAApproved" name="No"/>
+    <bpmn:sequenceFlow id="F22Y" sourceRef="G_ODTRequired" targetRef="T_CreateODTSubs" name="Yes"/>
+    <bpmn:sequenceFlow id="F23" sourceRef="T_CreateODTSubs" targetRef="T_ODTReview"/>
+    <bpmn:sequenceFlow id="F24" sourceRef="T_ODTReview" targetRef="G_ODTApproved"/>
+    <bpmn:sequenceFlow id="F25Y" sourceRef="G_ODTApproved" targetRef="T_DocODT" name="Yes"/>
+    <bpmn:sequenceFlow id="F25N" sourceRef="G_ODTApproved" targetRef="T_UpdateInfo" name="No - Rework"/>
+    <bpmn:sequenceFlow id="F26" sourceRef="T_DocODT" targetRef="T_RecordODT"/>
+    <bpmn:sequenceFlow id="F27" sourceRef="T_RecordODT" targetRef="G_SAApproved"/>
+    <bpmn:sequenceFlow id="F28Y" sourceRef="G_SAApproved" targetRef="T_NotifyAPTODT" name="Yes"/>
+    <bpmn:sequenceFlow id="F28N" sourceRef="G_SAApproved" targetRef="T_UpdateSolution" name="No - Suggested Changes"/>
+    <bpmn:sequenceFlow id="F29" sourceRef="T_UpdateSolution" targetRef="T_ValidateAPT"/>
+    <bpmn:sequenceFlow id="F30" sourceRef="T_NotifyAPTODT" targetRef="T_CreatePC2"/>
+    <bpmn:sequenceFlow id="F31" sourceRef="T_CreatePC2" targetRef="T_CreateITGSub"/>
+    <bpmn:sequenceFlow id="F32" sourceRef="T_CreateITGSub" targetRef="T_GovReview"/>
+    <bpmn:sequenceFlow id="F33" sourceRef="T_GovReview" targetRef="G_GovApproved"/>
+    <bpmn:sequenceFlow id="F34Y" sourceRef="G_GovApproved" targetRef="T_DocGovApprove" name="Yes"/>
+    <bpmn:sequenceFlow id="F34N" sourceRef="G_GovApproved" targetRef="T_DocGovReject" name="No"/>
+    <bpmn:sequenceFlow id="F35" sourceRef="T_DocGovApprove" targetRef="T_RecordGov"/>
+    <bpmn:sequenceFlow id="F36" sourceRef="T_RecordGov" targetRef="T_CloseJira"/>
+    <bpmn:sequenceFlow id="F37" sourceRef="T_CloseJira" targetRef="End_Complete"/>
+    <bpmn:sequenceFlow id="F38" sourceRef="T_DocGovReject" targetRef="G_TechRereview"/>
+    <bpmn:sequenceFlow id="F39N" sourceRef="G_TechRereview" targetRef="T_UpdateGovDocs" name="No - Documentation Only"/>
+    <bpmn:sequenceFlow id="F39Y" sourceRef="G_TechRereview" targetRef="T_UpdateSolution" name="Yes - Material Change"/>
+    <bpmn:sequenceFlow id="F40" sourceRef="T_UpdateGovDocs" targetRef="T_GovReview"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_FAR">
+    <bpmndi:BPMNPlane id="Plane_FAR" bpmnElement="Collaboration_FAR">
+      <bpmndi:BPMNShape id="ParticipantShape" bpmnElement="Participant_FAR" isHorizontal="true">
+        <dc:Bounds x="90" y="70" width="3830" height="830"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_APT_shape" bpmnElement="Lane_APT" isHorizontal="true">
+        <dc:Bounds x="120" y="70" width="3800" height="220"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_SA_shape" bpmnElement="Lane_SA" isHorizontal="true">
+        <dc:Bounds x="120" y="290" width="3800" height="190"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_ODT_shape" bpmnElement="Lane_ODT" isHorizontal="true">
+        <dc:Bounds x="120" y="480" width="3800" height="170"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_ITG_shape" bpmnElement="Lane_ITG" isHorizontal="true">
+        <dc:Bounds x="120" y="650" width="3800" height="250"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_Review_shape" bpmnElement="Start_Review">
+        <dc:Bounds x="160" y="135" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Submit_shape" bpmnElement="T_Submit">
+        <dc:Bounds x="230" y="115" width="135" height="75"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_CreateJira_shape" bpmnElement="T_CreateJira">
+        <dc:Bounds x="405" y="115" width="145" height="75"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_CreateAPTSubtask_shape" bpmnElement="T_CreateAPTSubtask">
+        <dc:Bounds x="590" y="115" width="145" height="75"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_UploadDocs_shape" bpmnElement="T_UploadDocs">
+        <dc:Bounds x="775" y="115" width="145" height="75"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ValidateAPT_shape" bpmnElement="T_ValidateAPT">
+        <dc:Bounds x="960" y="115" width="150" height="75"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_APTReady_shape" bpmnElement="G_APTReady" isMarkerVisible="true">
+        <dc:Bounds x="1150" y="128" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_UpdateInfo_shape" bpmnElement="T_UpdateInfo">
+        <dc:Bounds x="1010" y="205" width="155" height="65"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_MarkAPTInProgress_shape" bpmnElement="T_MarkAPTInProgress">
+        <dc:Bounds x="1240" y="105" width="145" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ScheduleAPT_shape" bpmnElement="T_ScheduleAPT">
+        <dc:Bounds x="1425" y="105" width="145" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ConductAPT_shape" bpmnElement="T_ConductAPT">
+        <dc:Bounds x="1610" y="105" width="150" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_Escalate_shape" bpmnElement="G_Escalate" isMarkerVisible="true">
+        <dc:Bounds x="1800" y="115" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ApproveAPT_shape" bpmnElement="T_ApproveAPT">
+        <dc:Bounds x="1895" y="90" width="135" height="65"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_RecordAPT_shape" bpmnElement="T_RecordAPT">
+        <dc:Bounds x="2070" y="90" width="150" height="65"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_NotifySAODT_shape" bpmnElement="T_NotifySAODT">
+        <dc:Bounds x="2260" y="90" width="145" height="65"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_Escalate_shape" bpmnElement="T_Escalate">
+        <dc:Bounds x="1895" y="315" width="155" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ValidateSA_shape" bpmnElement="T_ValidateSA">
+        <dc:Bounds x="2085" y="315" width="155" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_SAReady_shape" bpmnElement="G_SAReady" isMarkerVisible="true">
+        <dc:Bounds x="2280" y="325" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_MarkSAInProgress_shape" bpmnElement="T_MarkSAInProgress">
+        <dc:Bounds x="2370" y="295" width="145" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ScheduleSA_shape" bpmnElement="T_ScheduleSA">
+        <dc:Bounds x="2555" y="295" width="145" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ConductSA_shape" bpmnElement="T_ConductSA">
+        <dc:Bounds x="2740" y="295" width="165" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_ODTRequired_shape" bpmnElement="G_ODTRequired" isMarkerVisible="true">
+        <dc:Bounds x="2945" y="305" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_CreateODTSubs_shape" bpmnElement="T_CreateODTSubs">
+        <dc:Bounds x="3035" y="275" width="155" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_RecordODT_shape" bpmnElement="T_RecordODT">
+        <dc:Bounds x="3240" y="295" width="150" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_SAApproved_shape" bpmnElement="G_SAApproved" isMarkerVisible="true">
+        <dc:Bounds x="3430" y="305" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_NotifyAPTODT_shape" bpmnElement="T_NotifyAPTODT">
+        <dc:Bounds x="3520" y="275" width="150" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_ODTReview_shape" bpmnElement="T_ODTReview">
+        <dc:Bounds x="3035" y="515" width="150" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_ODTApproved_shape" bpmnElement="G_ODTApproved" isMarkerVisible="true">
+        <dc:Bounds x="3225" y="525" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_DocODT_shape" bpmnElement="T_DocODT">
+        <dc:Bounds x="3315" y="515" width="160" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_CreatePC2_shape" bpmnElement="T_CreatePC2">
+        <dc:Bounds x="2460" y="185" width="155" height="65"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_CreateITGSub_shape" bpmnElement="T_CreateITGSub">
+        <dc:Bounds x="2655" y="185" width="170" height="65"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_GovReview_shape" bpmnElement="T_GovReview">
+        <dc:Bounds x="2890" y="725" width="175" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_GovApproved_shape" bpmnElement="G_GovApproved" isMarkerVisible="true">
+        <dc:Bounds x="3105" y="735" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_DocGovApprove_shape" bpmnElement="T_DocGovApprove">
+        <dc:Bounds x="3195" y="695" width="175" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_DocGovReject_shape" bpmnElement="T_DocGovReject">
+        <dc:Bounds x="3195" y="790" width="185" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_TechRereview_shape" bpmnElement="G_TechRereview" isMarkerVisible="true">
+        <dc:Bounds x="3420" y="800" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_UpdateGovDocs_shape" bpmnElement="T_UpdateGovDocs">
+        <dc:Bounds x="3510" y="185" width="170" height="65"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_UpdateSolution_shape" bpmnElement="T_UpdateSolution">
+        <dc:Bounds x="3650" y="105" width="185" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_RecordGov_shape" bpmnElement="T_RecordGov">
+        <dc:Bounds x="3415" y="695" width="170" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_CloseJira_shape" bpmnElement="T_CloseJira">
+        <dc:Bounds x="3625" y="695" width="175" height="70"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Complete_shape" bpmnElement="End_Complete">
+        <dc:Bounds x="3845" y="712" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F01_edge" bpmnElement="F01">
+        <di:waypoint x="196" y="153"/>
+        <di:waypoint x="230" y="152"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F02_edge" bpmnElement="F02">
+        <di:waypoint x="365" y="152"/>
+        <di:waypoint x="405" y="152"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F03_edge" bpmnElement="F03">
+        <di:waypoint x="550" y="152"/>
+        <di:waypoint x="590" y="152"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F04_edge" bpmnElement="F04">
+        <di:waypoint x="735" y="152"/>
+        <di:waypoint x="775" y="152"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F05_edge" bpmnElement="F05">
+        <di:waypoint x="920" y="152"/>
+        <di:waypoint x="960" y="152"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F06_edge" bpmnElement="F06">
+        <di:waypoint x="1110" y="152"/>
+        <di:waypoint x="1150" y="153"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F07Y_edge" bpmnElement="F07Y">
+        <di:waypoint x="1200" y="153"/>
+        <di:waypoint x="1240" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F07N_edge" bpmnElement="F07N">
+        <di:waypoint x="1175" y="153"/>
+        <di:waypoint x="1175" y="237"/>
+        <di:waypoint x="1165" y="237"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F08_edge" bpmnElement="F08">
+        <di:waypoint x="1010" y="237"/>
+        <di:waypoint x="850" y="237"/>
+        <di:waypoint x="850" y="190"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F09_edge" bpmnElement="F09">
+        <di:waypoint x="1385" y="140"/>
+        <di:waypoint x="1425" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F10_edge" bpmnElement="F10">
+        <di:waypoint x="1570" y="140"/>
+        <di:waypoint x="1610" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F11_edge" bpmnElement="F11">
+        <di:waypoint x="1760" y="140"/>
+        <di:waypoint x="1800" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F12N_edge" bpmnElement="F12N">
+        <di:waypoint x="1850" y="140"/>
+        <di:waypoint x="1895" y="122"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F12Y_edge" bpmnElement="F12Y">
+        <di:waypoint x="1825" y="165"/>
+        <di:waypoint x="1825" y="350"/>
+        <di:waypoint x="1895" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F13_edge" bpmnElement="F13">
+        <di:waypoint x="2030" y="122"/>
+        <di:waypoint x="2070" y="122"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F14_edge" bpmnElement="F14">
+        <di:waypoint x="2220" y="122"/>
+        <di:waypoint x="2260" y="122"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F15_edge" bpmnElement="F15">
+        <di:waypoint x="2332" y="155"/>
+        <di:waypoint x="2332" y="217"/>
+        <di:waypoint x="2460" y="217"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F16_edge" bpmnElement="F16">
+        <di:waypoint x="2050" y="350"/>
+        <di:waypoint x="2085" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F17_edge" bpmnElement="F17">
+        <di:waypoint x="2240" y="350"/>
+        <di:waypoint x="2280" y="350"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F18Y_edge" bpmnElement="F18Y">
+        <di:waypoint x="2330" y="350"/>
+        <di:waypoint x="2370" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F18N_edge" bpmnElement="F18N">
+        <di:waypoint x="2305" y="350"/>
+        <di:waypoint x="2305" y="260"/>
+        <di:waypoint x="1088" y="260"/>
+        <di:waypoint x="1088" y="205"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F19_edge" bpmnElement="F19">
+        <di:waypoint x="2515" y="330"/>
+        <di:waypoint x="2555" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F20_edge" bpmnElement="F20">
+        <di:waypoint x="2700" y="330"/>
+        <di:waypoint x="2740" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F21_edge" bpmnElement="F21">
+        <di:waypoint x="2905" y="330"/>
+        <di:waypoint x="2945" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F22N_edge" bpmnElement="F22N">
+        <di:waypoint x="2970" y="330"/>
+        <di:waypoint x="2970" y="430"/>
+        <di:waypoint x="3455" y="430"/>
+        <di:waypoint x="3455" y="355"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F22Y_edge" bpmnElement="F22Y">
+        <di:waypoint x="2995" y="330"/>
+        <di:waypoint x="3035" y="310"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F23_edge" bpmnElement="F23">
+        <di:waypoint x="3112" y="345"/>
+        <di:waypoint x="3112" y="515"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F24_edge" bpmnElement="F24">
+        <di:waypoint x="3185" y="550"/>
+        <di:waypoint x="3225" y="550"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F25Y_edge" bpmnElement="F25Y">
+        <di:waypoint x="3275" y="550"/>
+        <di:waypoint x="3315" y="550"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F25N_edge" bpmnElement="F25N">
+        <di:waypoint x="3250" y="550"/>
+        <di:waypoint x="3250" y="620"/>
+        <di:waypoint x="1088" y="620"/>
+        <di:waypoint x="1088" y="270"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F26_edge" bpmnElement="F26">
+        <di:waypoint x="3475" y="550"/>
+        <di:waypoint x="3500" y="550"/>
+        <di:waypoint x="3500" y="330"/>
+        <di:waypoint x="3390" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F27_edge" bpmnElement="F27">
+        <di:waypoint x="3390" y="330"/>
+        <di:waypoint x="3430" y="330"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F28Y_edge" bpmnElement="F28Y">
+        <di:waypoint x="3480" y="330"/>
+        <di:waypoint x="3520" y="310"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F28N_edge" bpmnElement="F28N">
+        <di:waypoint x="3455" y="305"/>
+        <di:waypoint x="3455" y="225"/>
+        <di:waypoint x="3742" y="225"/>
+        <di:waypoint x="3742" y="175"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F29_edge" bpmnElement="F29">
+        <di:waypoint x="3650" y="140"/>
+        <di:waypoint x="1035" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F30_edge" bpmnElement="F30">
+        <di:waypoint x="3595" y="345"/>
+        <di:waypoint x="3595" y="260"/>
+        <di:waypoint x="2537" y="260"/>
+        <di:waypoint x="2537" y="250"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F31_edge" bpmnElement="F31">
+        <di:waypoint x="2615" y="217"/>
+        <di:waypoint x="2655" y="217"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F32_edge" bpmnElement="F32">
+        <di:waypoint x="2740" y="250"/>
+        <di:waypoint x="2740" y="760"/>
+        <di:waypoint x="2890" y="760"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F33_edge" bpmnElement="F33">
+        <di:waypoint x="3065" y="760"/>
+        <di:waypoint x="3105" y="760"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F34Y_edge" bpmnElement="F34Y">
+        <di:waypoint x="3155" y="760"/>
+        <di:waypoint x="3195" y="730"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F34N_edge" bpmnElement="F34N">
+        <di:waypoint x="3130" y="785"/>
+        <di:waypoint x="3130" y="825"/>
+        <di:waypoint x="3195" y="825"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F35_edge" bpmnElement="F35">
+        <di:waypoint x="3370" y="730"/>
+        <di:waypoint x="3415" y="730"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F36_edge" bpmnElement="F36">
+        <di:waypoint x="3585" y="730"/>
+        <di:waypoint x="3625" y="730"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F37_edge" bpmnElement="F37">
+        <di:waypoint x="3800" y="730"/>
+        <di:waypoint x="3845" y="730"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F38_edge" bpmnElement="F38">
+        <di:waypoint x="3380" y="825"/>
+        <di:waypoint x="3420" y="825"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F39N_edge" bpmnElement="F39N">
+        <di:waypoint x="3445" y="800"/>
+        <di:waypoint x="3445" y="217"/>
+        <di:waypoint x="3510" y="217"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F39Y_edge" bpmnElement="F39Y">
+        <di:waypoint x="3470" y="825"/>
+        <di:waypoint x="3810" y="825"/>
+        <di:waypoint x="3810" y="140"/>
+        <di:waypoint x="3835" y="140"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F40_edge" bpmnElement="F40">
+        <di:waypoint x="3510" y="217"/>
+        <di:waypoint x="2835" y="217"/>
+        <di:waypoint x="2835" y="760"/>
+        <di:waypoint x="2890" y="760"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
