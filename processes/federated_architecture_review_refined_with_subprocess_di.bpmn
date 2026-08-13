@@ -1,0 +1,594 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_FAR" targetNamespace="http://example.com/federated-architecture-review">
+  <bpmn:collaboration id="Collaboration_FAR">
+    <bpmn:participant id="Participant_FAR" name="Federated Architecture Review" processRef="Process_FAR" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_FAR" name="Federated Architecture Review" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Main">
+      <bpmn:lane id="Lane_APT" name="APT / Portfolio Reviewer">
+        <bpmn:flowNodeRef>Start_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SP_Portfolio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_Escalate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_RecordAPTApproval</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SP_Closure</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Complete</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_SA" name="Solution Architecture (SA)">
+        <bpmn:flowNodeRef>SP_SAReview</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_SAEndorse</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_SAEndorsed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_ReturnChanges</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_ITG" name="IT Governance (ITG)">
+        <bpmn:flowNodeRef>SP_Governance</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_RecordComplete</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_CorrectGovRecord</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Review" name="Review Request Initiated" />
+    <bpmn:subProcess id="SP_Portfolio" name="Portfolio Architecture Review">
+      <bpmn:startEvent id="P_Start" />
+      <bpmn:userTask id="P_Submit" name="Submit Architecture Review Request via MS Form" />
+      <bpmn:userTask id="P_CreateJira" name="Create Architecture Review Jira Record" />
+      <bpmn:userTask id="P_CreateSub" name="Create Portfolio Review Jira Sub-task" />
+      <bpmn:userTask id="P_Upload" name="Attach Supporting Documentation" />
+      <bpmn:userTask id="P_Validate" name="Validate Review Documentation" />
+      <bpmn:exclusiveGateway id="P_Ready" name="Review Ready?" />
+      <bpmn:userTask id="P_UpdateInfo" name="Provide Required Information" />
+      <bpmn:userTask id="P_InProgress" name="Set Portfolio Review to In Progress" />
+      <bpmn:userTask id="P_Schedule" name="Schedule Portfolio Review, if Required" />
+      <bpmn:userTask id="P_Conduct" name="Conduct Portfolio Architecture Review" />
+      <bpmn:exclusiveGateway id="P_Consult" name="Specialist Consultation Required?" />
+      <bpmn:userTask id="P_ConsultTask" name="Obtain Specialist/ODT Consultation" />
+      <bpmn:userTask id="P_Record" name="Record Portfolio Review Outcome in Jira" />
+      <bpmn:endEvent id="P_End" />
+      <bpmn:sequenceFlow id="PF1" sourceRef="P_Start" targetRef="P_Submit" />
+      <bpmn:sequenceFlow id="PF2" sourceRef="P_Submit" targetRef="P_CreateJira" />
+      <bpmn:sequenceFlow id="PF3" sourceRef="P_CreateJira" targetRef="P_CreateSub" />
+      <bpmn:sequenceFlow id="PF4" sourceRef="P_CreateSub" targetRef="P_Upload" />
+      <bpmn:sequenceFlow id="PF5" sourceRef="P_Upload" targetRef="P_Validate" />
+      <bpmn:sequenceFlow id="PF6" sourceRef="P_Validate" targetRef="P_Ready" />
+      <bpmn:sequenceFlow id="PF7Y" name="Yes" sourceRef="P_Ready" targetRef="P_InProgress" />
+      <bpmn:sequenceFlow id="PF7N" name="No" sourceRef="P_Ready" targetRef="P_UpdateInfo" />
+      <bpmn:sequenceFlow id="PF8" sourceRef="P_UpdateInfo" targetRef="P_Validate" />
+      <bpmn:sequenceFlow id="PF9" sourceRef="P_InProgress" targetRef="P_Schedule" />
+      <bpmn:sequenceFlow id="PF10" sourceRef="P_Schedule" targetRef="P_Conduct" />
+      <bpmn:sequenceFlow id="PF11" sourceRef="P_Conduct" targetRef="P_Consult" />
+      <bpmn:sequenceFlow id="PF12Y" name="Yes" sourceRef="P_Consult" targetRef="P_ConsultTask" />
+      <bpmn:sequenceFlow id="PF12N" name="No" sourceRef="P_Consult" targetRef="P_Record" />
+      <bpmn:sequenceFlow id="PF13" sourceRef="P_ConsultTask" targetRef="P_Conduct" />
+      <bpmn:sequenceFlow id="PF14" sourceRef="P_Record" targetRef="P_End" />
+    </bpmn:subProcess>
+    <bpmn:exclusiveGateway id="G_Escalate" name="SA Review Required?" />
+    <bpmn:subProcess id="SP_SAReview" name="Solution Architecture Review">
+      <bpmn:startEvent id="S_Start" />
+      <bpmn:userTask id="S_Escalate" name="Assign Escalated Review to SA" />
+      <bpmn:userTask id="S_Validate" name="Validate Escalated Review Documentation" />
+      <bpmn:exclusiveGateway id="S_Ready" name="Review Ready?" />
+      <bpmn:userTask id="S_UpdateInfo" name="Request Required Information" />
+      <bpmn:userTask id="S_InProgress" name="Set SA Review to In Progress" />
+      <bpmn:userTask id="S_Schedule" name="Schedule SA Review" />
+      <bpmn:userTask id="S_Conduct" name="Conduct SA Review" />
+      <bpmn:exclusiveGateway id="S_Consult" name="Specialist Consultation Required?" />
+      <bpmn:userTask id="S_ConsultTask" name="Obtain Specialist/ODT Consultation" />
+      <bpmn:exclusiveGateway id="S_Approved" name="SA Approval Granted?" />
+      <bpmn:userTask id="S_RecordApprove" name="Record SA Approval in Jira" />
+      <bpmn:userTask id="S_RecordChanges" name="Record Required Changes in Jira" />
+      <bpmn:endEvent id="S_EndApproved" name="SA Approved" />
+      <bpmn:endEvent id="S_EndRework" name="Rework Required" />
+      <bpmn:sequenceFlow id="SF1" sourceRef="S_Start" targetRef="S_Escalate" />
+      <bpmn:sequenceFlow id="SF2" sourceRef="S_Escalate" targetRef="S_Validate" />
+      <bpmn:sequenceFlow id="SF3" sourceRef="S_Validate" targetRef="S_Ready" />
+      <bpmn:sequenceFlow id="SF4Y" name="Yes" sourceRef="S_Ready" targetRef="S_InProgress" />
+      <bpmn:sequenceFlow id="SF4N" name="No" sourceRef="S_Ready" targetRef="S_UpdateInfo" />
+      <bpmn:sequenceFlow id="SF5" sourceRef="S_UpdateInfo" targetRef="S_Validate" />
+      <bpmn:sequenceFlow id="SF6" sourceRef="S_InProgress" targetRef="S_Schedule" />
+      <bpmn:sequenceFlow id="SF7" sourceRef="S_Schedule" targetRef="S_Conduct" />
+      <bpmn:sequenceFlow id="SF8" sourceRef="S_Conduct" targetRef="S_Consult" />
+      <bpmn:sequenceFlow id="SF9Y" name="Yes" sourceRef="S_Consult" targetRef="S_ConsultTask" />
+      <bpmn:sequenceFlow id="SF9N" name="No" sourceRef="S_Consult" targetRef="S_Approved" />
+      <bpmn:sequenceFlow id="SF10" sourceRef="S_ConsultTask" targetRef="S_Conduct" />
+      <bpmn:sequenceFlow id="SF11Y" name="Yes" sourceRef="S_Approved" targetRef="S_RecordApprove" />
+      <bpmn:sequenceFlow id="SF11N" name="No" sourceRef="S_Approved" targetRef="S_RecordChanges" />
+      <bpmn:sequenceFlow id="SF12" sourceRef="S_RecordApprove" targetRef="S_EndApproved" />
+      <bpmn:sequenceFlow id="SF13" sourceRef="S_RecordChanges" targetRef="S_EndRework" />
+    </bpmn:subProcess>
+    <bpmn:userTask id="T_RecordAPTApproval" name="Record Portfolio Review Outcome in Jira" />
+    <bpmn:userTask id="T_SAEndorse" name="Obtain SA Approval for Tollgate Governance" />
+    <bpmn:exclusiveGateway id="G_SAEndorsed" name="SA Approval Granted?" />
+    <bpmn:userTask id="T_ReturnChanges" name="Return Required Changes to Portfolio Reviewer" />
+    <bpmn:subProcess id="SP_Governance" name="ITG Tollgate Governance / Recording">
+      <bpmn:startEvent id="G_Start" />
+      <bpmn:userTask id="G_CreateTracking" name="Create or Update Tollgate Governance Record" />
+      <bpmn:userTask id="G_CreateTask" name="Create ITG Tollgate Task and Notify Contact" />
+      <bpmn:userTask id="G_VerifyApproval" name="Verify SA Approval" />
+      <bpmn:userTask id="G_VerifyArtifacts" name="Verify Required Review Steps and Artifacts" />
+      <bpmn:userTask id="G_Record" name="Record Tollgate Governance Outcome" />
+      <bpmn:endEvent id="G_End" />
+      <bpmn:sequenceFlow id="GF1" sourceRef="G_Start" targetRef="G_CreateTracking" />
+      <bpmn:sequenceFlow id="GF2" sourceRef="G_CreateTracking" targetRef="G_CreateTask" />
+      <bpmn:sequenceFlow id="GF3" sourceRef="G_CreateTask" targetRef="G_VerifyApproval" />
+      <bpmn:sequenceFlow id="GF4" sourceRef="G_VerifyApproval" targetRef="G_VerifyArtifacts" />
+      <bpmn:sequenceFlow id="GF5" sourceRef="G_VerifyArtifacts" targetRef="G_Record" />
+      <bpmn:sequenceFlow id="GF6" sourceRef="G_Record" targetRef="G_End" />
+    </bpmn:subProcess>
+    <bpmn:exclusiveGateway id="G_RecordComplete" name="Tollgate Governance Record Complete?" />
+    <bpmn:userTask id="T_CorrectGovRecord" name="Complete or Correct Tollgate Governance Record" />
+    <bpmn:subProcess id="SP_Closure" name="Architecture Review Closure">
+      <bpmn:startEvent id="C_Start" />
+      <bpmn:userTask id="C_Record" name="Record Final Review Status in Parent Jira" />
+      <bpmn:userTask id="C_Notify" name="Notify Review Stakeholders" />
+      <bpmn:userTask id="C_Close" name="Set ar-complete and Close Jira Tasks" />
+      <bpmn:endEvent id="C_End" />
+      <bpmn:sequenceFlow id="CF1" sourceRef="C_Start" targetRef="C_Record" />
+      <bpmn:sequenceFlow id="CF2" sourceRef="C_Record" targetRef="C_Notify" />
+      <bpmn:sequenceFlow id="CF3" sourceRef="C_Notify" targetRef="C_Close" />
+      <bpmn:sequenceFlow id="CF4" sourceRef="C_Close" targetRef="C_End" />
+    </bpmn:subProcess>
+    <bpmn:endEvent id="End_Complete" name="Architecture Review Completed" />
+    <bpmn:sequenceFlow id="F1" sourceRef="Start_Review" targetRef="SP_Portfolio" />
+    <bpmn:sequenceFlow id="F2" sourceRef="SP_Portfolio" targetRef="G_Escalate" />
+    <bpmn:sequenceFlow id="F3Y" name="Yes" sourceRef="G_Escalate" targetRef="SP_SAReview" />
+    <bpmn:sequenceFlow id="F3N" name="No" sourceRef="G_Escalate" targetRef="T_RecordAPTApproval" />
+    <bpmn:sequenceFlow id="F4" sourceRef="T_RecordAPTApproval" targetRef="T_SAEndorse" />
+    <bpmn:sequenceFlow id="F5" sourceRef="T_SAEndorse" targetRef="G_SAEndorsed" />
+    <bpmn:sequenceFlow id="F6Y" name="Yes" sourceRef="G_SAEndorsed" targetRef="SP_Governance" />
+    <bpmn:sequenceFlow id="F6N" name="No" sourceRef="G_SAEndorsed" targetRef="T_ReturnChanges" />
+    <bpmn:sequenceFlow id="F7" sourceRef="T_ReturnChanges" targetRef="SP_Portfolio" />
+    <bpmn:sequenceFlow id="F8" name="SA Review Completed" sourceRef="SP_SAReview" targetRef="SP_Governance" />
+    <bpmn:sequenceFlow id="F9" sourceRef="SP_Governance" targetRef="G_RecordComplete" />
+    <bpmn:sequenceFlow id="F10Y" name="Yes" sourceRef="G_RecordComplete" targetRef="SP_Closure" />
+    <bpmn:sequenceFlow id="F10N" name="No" sourceRef="G_RecordComplete" targetRef="T_CorrectGovRecord" />
+    <bpmn:sequenceFlow id="F11" sourceRef="T_CorrectGovRecord" targetRef="SP_Governance" />
+    <bpmn:sequenceFlow id="F12" sourceRef="SP_Closure" targetRef="End_Complete" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_FAR">
+    <bpmndi:BPMNPlane id="Plane_FAR" bpmnElement="Collaboration_FAR">
+      <bpmndi:BPMNShape id="Shape_Participant" bpmnElement="Participant_FAR" isHorizontal="true">
+        <dc:Bounds x="80" y="80" width="1900" height="600" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LaneAPT" bpmnElement="Lane_APT" isHorizontal="true">
+        <dc:Bounds x="110" y="80" width="1870" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LaneSA" bpmnElement="Lane_SA" isHorizontal="true">
+        <dc:Bounds x="110" y="280" width="1870" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LaneITG" bpmnElement="Lane_ITG" isHorizontal="true">
+        <dc:Bounds x="110" y="480" width="1870" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_Start" bpmnElement="Start_Review">
+        <dc:Bounds x="160" y="155" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_Portfolio" bpmnElement="SP_Portfolio" isExpanded="false">
+        <dc:Bounds x="240" y="130" width="170" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_Esc" bpmnElement="G_Escalate" isMarkerVisible="true">
+        <dc:Bounds x="460" y="150" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_RecordAPT" bpmnElement="T_RecordAPTApproval">
+        <dc:Bounds x="560" y="115" width="160" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_SAReview" bpmnElement="SP_SAReview" isExpanded="false">
+        <dc:Bounds x="560" y="330" width="180" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_Endorse" bpmnElement="T_SAEndorse">
+        <dc:Bounds x="790" y="315" width="190" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_Endorsed" bpmnElement="G_SAEndorsed" isMarkerVisible="true">
+        <dc:Bounds x="1030" y="330" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_Return" bpmnElement="T_ReturnChanges">
+        <dc:Bounds x="1130" y="395" width="180" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_Gov" bpmnElement="SP_Governance" isExpanded="false">
+        <dc:Bounds x="1150" y="530" width="190" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_RecordComplete" bpmnElement="G_RecordComplete" isMarkerVisible="true">
+        <dc:Bounds x="1390" y="550" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_Correct" bpmnElement="T_CorrectGovRecord">
+        <dc:Bounds x="1490" y="595" width="180" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_Closure" bpmnElement="SP_Closure" isExpanded="false">
+        <dc:Bounds x="1510" y="130" width="170" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Sh_End" bpmnElement="End_Complete">
+        <dc:Bounds x="1740" y="157" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="E1" bpmnElement="F1">
+        <di:waypoint x="196" y="173" />
+        <di:waypoint x="240" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E2" bpmnElement="F2">
+        <di:waypoint x="410" y="175" />
+        <di:waypoint x="460" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E3Y" bpmnElement="F3Y">
+        <di:waypoint x="485" y="200" />
+        <di:waypoint x="485" y="375" />
+        <di:waypoint x="560" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E3N" bpmnElement="F3N">
+        <di:waypoint x="510" y="175" />
+        <di:waypoint x="560" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E4" bpmnElement="F4">
+        <di:waypoint x="720" y="150" />
+        <di:waypoint x="760" y="150" />
+        <di:waypoint x="760" y="355" />
+        <di:waypoint x="790" y="355" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E5" bpmnElement="F5">
+        <di:waypoint x="980" y="355" />
+        <di:waypoint x="1030" y="355" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E6Y" bpmnElement="F6Y">
+        <di:waypoint x="1055" y="380" />
+        <di:waypoint x="1055" y="575" />
+        <di:waypoint x="1150" y="575" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E6N" bpmnElement="F6N">
+        <di:waypoint x="1080" y="355" />
+        <di:waypoint x="1130" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E7" bpmnElement="F7">
+        <di:waypoint x="1130" y="430" />
+        <di:waypoint x="430" y="430" />
+        <di:waypoint x="430" y="175" />
+        <di:waypoint x="410" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E8" bpmnElement="F8">
+        <di:waypoint x="740" y="375" />
+        <di:waypoint x="760" y="375" />
+        <di:waypoint x="760" y="500" />
+        <di:waypoint x="1245" y="500" />
+        <di:waypoint x="1245" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E9" bpmnElement="F9">
+        <di:waypoint x="1340" y="575" />
+        <di:waypoint x="1390" y="575" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E10Y" bpmnElement="F10Y">
+        <di:waypoint x="1415" y="550" />
+        <di:waypoint x="1415" y="175" />
+        <di:waypoint x="1510" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E10N" bpmnElement="F10N">
+        <di:waypoint x="1440" y="575" />
+        <di:waypoint x="1490" y="627" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E11" bpmnElement="F11">
+        <di:waypoint x="1490" y="627" />
+        <di:waypoint x="1360" y="627" />
+        <di:waypoint x="1360" y="575" />
+        <di:waypoint x="1340" y="575" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="E12" bpmnElement="F12">
+        <di:waypoint x="1680" y="175" />
+        <di:waypoint x="1740" y="175" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_Portfolio">
+    <bpmndi:BPMNPlane id="Plane_Portfolio" bpmnElement="SP_Portfolio">
+      <bpmndi:BPMNShape id="PDI_Start" bpmnElement="P_Start">
+        <dc:Bounds x="90" y="190" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_Submit" bpmnElement="P_Submit">
+        <dc:Bounds x="160" y="165" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_CreateJira" bpmnElement="P_CreateJira">
+        <dc:Bounds x="350" y="165" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_CreateSub" bpmnElement="P_CreateSub">
+        <dc:Bounds x="540" y="165" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_Upload" bpmnElement="P_Upload">
+        <dc:Bounds x="730" y="165" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_Validate" bpmnElement="P_Validate">
+        <dc:Bounds x="920" y="165" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_Ready" bpmnElement="P_Ready" isMarkerVisible="true">
+        <dc:Bounds x="1110" y="180" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_InProgress" bpmnElement="P_InProgress">
+        <dc:Bounds x="1210" y="165" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_Schedule" bpmnElement="P_Schedule">
+        <dc:Bounds x="1410" y="165" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_Conduct" bpmnElement="P_Conduct">
+        <dc:Bounds x="1610" y="165" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_Consult" bpmnElement="P_Consult" isMarkerVisible="true">
+        <dc:Bounds x="1820" y="180" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_Record" bpmnElement="P_Record">
+        <dc:Bounds x="1930" y="165" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_End" bpmnElement="P_End">
+        <dc:Bounds x="2140" y="187" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_UpdateInfo" bpmnElement="P_UpdateInfo">
+        <dc:Bounds x="1010" y="330" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="PDI_ConsultTask" bpmnElement="P_ConsultTask">
+        <dc:Bounds x="1720" y="330" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="PDE_PF1" bpmnElement="PF1">
+        <di:waypoint x="126" y="208" />
+        <di:waypoint x="160" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF2" bpmnElement="PF2">
+        <di:waypoint x="310" y="205" />
+        <di:waypoint x="350" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF3" bpmnElement="PF3">
+        <di:waypoint x="500" y="205" />
+        <di:waypoint x="540" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF4" bpmnElement="PF4">
+        <di:waypoint x="690" y="205" />
+        <di:waypoint x="730" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF5" bpmnElement="PF5">
+        <di:waypoint x="880" y="205" />
+        <di:waypoint x="920" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF6" bpmnElement="PF6">
+        <di:waypoint x="1070" y="205" />
+        <di:waypoint x="1110" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF7Y" bpmnElement="PF7Y">
+        <di:waypoint x="1160" y="205" />
+        <di:waypoint x="1210" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF7N" bpmnElement="PF7N">
+        <di:waypoint x="1135" y="230" />
+        <di:waypoint x="1135" y="290" />
+        <di:waypoint x="1095" y="290" />
+        <di:waypoint x="1095" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF8" bpmnElement="PF8">
+        <di:waypoint x="1010" y="370" />
+        <di:waypoint x="960" y="370" />
+        <di:waypoint x="960" y="245" />
+        <di:waypoint x="995" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF9" bpmnElement="PF9">
+        <di:waypoint x="1370" y="205" />
+        <di:waypoint x="1410" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF10" bpmnElement="PF10">
+        <di:waypoint x="1570" y="205" />
+        <di:waypoint x="1610" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF11" bpmnElement="PF11">
+        <di:waypoint x="1780" y="205" />
+        <di:waypoint x="1820" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF12N" bpmnElement="PF12N">
+        <di:waypoint x="1870" y="205" />
+        <di:waypoint x="1930" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF12Y" bpmnElement="PF12Y">
+        <di:waypoint x="1845" y="230" />
+        <di:waypoint x="1845" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF13" bpmnElement="PF13">
+        <di:waypoint x="1720" y="370" />
+        <di:waypoint x="1695" y="370" />
+        <di:waypoint x="1695" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="PDE_PF14" bpmnElement="PF14">
+        <di:waypoint x="2100" y="205" />
+        <di:waypoint x="2140" y="205" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_SAReview">
+    <bpmndi:BPMNPlane id="Plane_SAReview" bpmnElement="SP_SAReview">
+      <bpmndi:BPMNShape id="SDI_Start" bpmnElement="S_Start">
+        <dc:Bounds x="90" y="190" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_Escalate" bpmnElement="S_Escalate">
+        <dc:Bounds x="160" y="165" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_Validate" bpmnElement="S_Validate">
+        <dc:Bounds x="360" y="165" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_Ready" bpmnElement="S_Ready" isMarkerVisible="true">
+        <dc:Bounds x="570" y="180" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_InProgress" bpmnElement="S_InProgress">
+        <dc:Bounds x="670" y="165" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_Schedule" bpmnElement="S_Schedule">
+        <dc:Bounds x="870" y="165" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_Conduct" bpmnElement="S_Conduct">
+        <dc:Bounds x="1060" y="165" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_Consult" bpmnElement="S_Consult" isMarkerVisible="true">
+        <dc:Bounds x="1260" y="180" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_Approved" bpmnElement="S_Approved" isMarkerVisible="true">
+        <dc:Bounds x="1480" y="180" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_RecordApprove" bpmnElement="S_RecordApprove">
+        <dc:Bounds x="1580" y="110" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_EndApproved" bpmnElement="S_EndApproved">
+        <dc:Bounds x="1790" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_RecordChanges" bpmnElement="S_RecordChanges">
+        <dc:Bounds x="1580" y="285" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_EndRework" bpmnElement="S_EndRework">
+        <dc:Bounds x="1790" y="307" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_UpdateInfo" bpmnElement="S_UpdateInfo">
+        <dc:Bounds x="460" y="330" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SDI_ConsultTask" bpmnElement="S_ConsultTask">
+        <dc:Bounds x="1160" y="330" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SDE_SF1" bpmnElement="SF1">
+        <di:waypoint x="126" y="208" />
+        <di:waypoint x="160" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF2" bpmnElement="SF2">
+        <di:waypoint x="320" y="205" />
+        <di:waypoint x="360" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF3" bpmnElement="SF3">
+        <di:waypoint x="530" y="205" />
+        <di:waypoint x="570" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF4Y" bpmnElement="SF4Y">
+        <di:waypoint x="620" y="205" />
+        <di:waypoint x="670" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF4N" bpmnElement="SF4N">
+        <di:waypoint x="595" y="230" />
+        <di:waypoint x="595" y="290" />
+        <di:waypoint x="550" y="290" />
+        <di:waypoint x="550" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF5" bpmnElement="SF5">
+        <di:waypoint x="460" y="370" />
+        <di:waypoint x="425" y="370" />
+        <di:waypoint x="425" y="245" />
+        <di:waypoint x="445" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF6" bpmnElement="SF6">
+        <di:waypoint x="830" y="205" />
+        <di:waypoint x="870" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF7" bpmnElement="SF7">
+        <di:waypoint x="1020" y="205" />
+        <di:waypoint x="1060" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF8" bpmnElement="SF8">
+        <di:waypoint x="1220" y="205" />
+        <di:waypoint x="1260" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF9N" bpmnElement="SF9N">
+        <di:waypoint x="1310" y="205" />
+        <di:waypoint x="1480" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF9Y" bpmnElement="SF9Y">
+        <di:waypoint x="1285" y="230" />
+        <di:waypoint x="1285" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF10" bpmnElement="SF10">
+        <di:waypoint x="1160" y="370" />
+        <di:waypoint x="1140" y="370" />
+        <di:waypoint x="1140" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF11Y" bpmnElement="SF11Y">
+        <di:waypoint x="1505" y="180" />
+        <di:waypoint x="1505" y="150" />
+        <di:waypoint x="1580" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF11N" bpmnElement="SF11N">
+        <di:waypoint x="1505" y="230" />
+        <di:waypoint x="1505" y="325" />
+        <di:waypoint x="1580" y="325" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF12" bpmnElement="SF12">
+        <di:waypoint x="1750" y="150" />
+        <di:waypoint x="1790" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SDE_SF13" bpmnElement="SF13">
+        <di:waypoint x="1750" y="325" />
+        <di:waypoint x="1790" y="325" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_Governance">
+    <bpmndi:BPMNPlane id="Plane_Governance" bpmnElement="SP_Governance">
+      <bpmndi:BPMNShape id="GDI_Start" bpmnElement="G_Start">
+        <dc:Bounds x="90" y="190" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GDI_CreateTracking" bpmnElement="G_CreateTracking">
+        <dc:Bounds x="160" y="165" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GDI_CreateTask" bpmnElement="G_CreateTask">
+        <dc:Bounds x="390" y="165" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GDI_VerifyApproval" bpmnElement="G_VerifyApproval">
+        <dc:Bounds x="620" y="165" width="160" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GDI_VerifyArtifacts" bpmnElement="G_VerifyArtifacts">
+        <dc:Bounds x="830" y="165" width="190" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GDI_Record" bpmnElement="G_Record">
+        <dc:Bounds x="1070" y="165" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GDI_End" bpmnElement="G_End">
+        <dc:Bounds x="1300" y="187" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="GDE_GF1" bpmnElement="GF1">
+        <di:waypoint x="126" y="208" />
+        <di:waypoint x="160" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="GDE_GF2" bpmnElement="GF2">
+        <di:waypoint x="340" y="205" />
+        <di:waypoint x="390" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="GDE_GF3" bpmnElement="GF3">
+        <di:waypoint x="570" y="205" />
+        <di:waypoint x="620" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="GDE_GF4" bpmnElement="GF4">
+        <di:waypoint x="780" y="205" />
+        <di:waypoint x="830" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="GDE_GF5" bpmnElement="GF5">
+        <di:waypoint x="1020" y="205" />
+        <di:waypoint x="1070" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="GDE_GF6" bpmnElement="GF6">
+        <di:waypoint x="1250" y="205" />
+        <di:waypoint x="1300" y="205" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="Diagram_Closure">
+    <bpmndi:BPMNPlane id="Plane_Closure" bpmnElement="SP_Closure">
+      <bpmndi:BPMNShape id="CDI_Start" bpmnElement="C_Start">
+        <dc:Bounds x="90" y="190" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CDI_Record" bpmnElement="C_Record">
+        <dc:Bounds x="160" y="165" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CDI_Notify" bpmnElement="C_Notify">
+        <dc:Bounds x="390" y="165" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CDI_Close" bpmnElement="C_Close">
+        <dc:Bounds x="610" y="165" width="190" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="CDI_End" bpmnElement="C_End">
+        <dc:Bounds x="850" y="187" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="CDE_CF1" bpmnElement="CF1">
+        <di:waypoint x="126" y="208" />
+        <di:waypoint x="160" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CDE_CF2" bpmnElement="CF2">
+        <di:waypoint x="340" y="205" />
+        <di:waypoint x="390" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CDE_CF3" bpmnElement="CF3">
+        <di:waypoint x="560" y="205" />
+        <di:waypoint x="610" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="CDE_CF4" bpmnElement="CF4">
+        <di:waypoint x="800" y="205" />
+        <di:waypoint x="850" y="205" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
