@@ -1,0 +1,61 @@
+Here's the same review in plainer terms.
+
+
+
+The four documents don't agree with each other.
+
+The team produced an IT proposal, a technical design, and two diagrams — and they contradict each other on things that change what gets built. The proposal says metadata goes to a MySQL database; the OCP diagram says SQL Server. The proposal says they're building two microservices; the technical design says three. The technical design points at a sandbox Cosmos database in what is supposed to be a production design, and the OCP diagram contradicts itself on the same panel — the name field says sandbox, the host field says production. Apigee is listed as the API gateway but doesn't appear in either diagram, so nobody can tell whether traffic actually flows through it. And the Azure diagram is three months older than everything else, so it predates the cataloguing and indexing work that was added in September.
+
+
+
+The application knows that someone asked a question, but not reliably who.
+
+The app signs into Azure as itself, not on behalf of the person using it. That's a normal pattern, but it means Azure never sees the end user. The design tries to compensate by storing a UserId and Role in the database — except those values are marked as "passed in," meaning the caller supplies them. If the caller declares its own role, anyone who can reach the API can claim to be anyone. For contract data that's a real exposure, and it also means the audit log can't answer "which employee read which customer's contract."
+
+
+
+There's no actual mechanism for keeping people out of documents they shouldn't see.
+
+The proposal says Cosmos DB will store metadata "for RBAC enforcement." That's a statement of intent, not a design. The search index has one role field and nothing that identifies a customer, an entity, or an access list. Until each chunk of each document carries permission information, and the search query is filtered by the user's verified permissions, everyone who can use the tool can effectively see everything in it.
+
+
+
+The AI agents can call tools, and they're being fed untrusted documents.
+
+This is the risk I'd flag hardest. Customer PDFs get chunked up and fed to AI agents as context. Those same agents can call functions (the MCP servers) that reach real systems. That means text hidden inside a contract PDF can potentially instruct the agent to do something — and nothing in the design addresses this. Worse, the sections of the technical design that should describe those tools are literally marked "N/A" with empty tables. The most security-sensitive component in the architecture is the least documented.
+
+
+
+Nobody has defined what "working correctly" means.
+
+The entire testing section reads: "Dev/QA Environment will be created for testing." There's no accuracy target for the document extraction, no test set to measure against, no requirement that answers cite their source, and no human review step — even though one of the agents summarizes legally binding contracts. If the AI confidently gets a payment term wrong, there's currently no process that would catch it.
+
+
+
+The same fact lives in three places with no owner.
+
+Document metadata sits in Cosmos DB, in a SQL database, and in the search index. No document says which one is authoritative, and the section that should explain the data model still contains the blank Word template instructions. On top of that, the integration between two of them works by generating an Excel file, dropping it in blob storage, and having another service parse it back out. That's fragile and will not hold up at volume.
+
+
+
+Nothing is designed for the day it breaks.
+
+The technical design says outright that error handling and recovery are deferred to a later phase. There's no dead-letter queue for failed documents, no retry logic, no runbook for reprocessing. Everything is in one Azure region with no disaster recovery position, no recovery time objective, and no acknowledgment that a search index can't simply be restored from backup — it has to be rebuilt from source, which takes time nobody has estimated.
+
+
+
+Also worth noting: document delete doesn't propagate (removing a PDF leaves its content answerable in the index), duplicate ingestion isn't prevented even though the event system can deliver the same message twice, and the search index's vector field is defined as a text string, which isn't a valid vector field — probably a typo, but it's the core of how retrieval works.
+
+
+
+The commercial picture is missing.
+
+The "Estimated Cost/Benefits" section contains no costs — just benefits. For a service billed per token and per page processed, that's a gap. There's also no sizing anywhere: how many documents, how many users, how fast responses need to come back. The 75-day estimate has no line items for training the custom extraction models, prompt engineering, evaluation, or security testing. And no Product Owner is named, so there's currently no business person accountable for whether the AI's answers are any good.
+
+
+
+The documents themselves need work. Both Word files still carry headers from a different project ("Sales B2B authentication"), unremoved template boilerplate including IBMi mainframe guidance that has nothing to do with this Python/Azure workload, a placeholder that reads "filename1 = blahblah master file," and empty risk and revision tables.
+
+
+
+Want me to add this plain-language version to the published document as an executive summary section at the top?
